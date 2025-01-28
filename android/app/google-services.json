@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "815419857591",
+    "project_id": "marinobarbersalon-5b1aa",
+    "storage_bucket": "marinobarbersalon-5b1aa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:815419857591:android:732a403565395b85ba0b32",
+        "android_client_info": {
+          "package_name": "com.example.marino_barber_salon_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAleJD9s7e-JBo9A73rS6Rrh3lujcfu61w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:815419857591:android:9fc3c6d72356d7afba0b32",
+        "android_client_info": {
+          "package_name": "com.example.marinobarbersalon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAleJD9s7e-JBo9A73rS6Rrh3lujcfu61w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
