@@ -3,6 +3,7 @@ import 'package:marino_barber_salon_flutter/Navigations/home_navigations.dart';
 import 'package:marino_barber_salon_flutter/Navigations/shop_navigations.dart';
 import 'package:marino_barber_salon_flutter/app_bar.dart';
 import 'package:marino_barber_salon_flutter/main.dart';
+import 'package:marino_barber_salon_flutter/my_colors.dart';
 import 'package:marino_barber_salon_flutter/user_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -70,3 +71,103 @@ class _AccountState extends State<Account>{
   }
 
 }
+
+
+
+class AccountScreen extends StatelessWidget {
+
+  final int notifichePrenotazioni;
+  final int notificheProdotti;
+
+  const AccountScreen({
+    super.key,
+
+    this.notifichePrenotazioni = 0,
+    this.notificheProdotti = 0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: MyAppBar('ACCOUNT', false),
+      backgroundColor: myGrey,
+      body: Column(
+
+        children: [
+          Container(
+            width: double.infinity,
+            height: 55,
+            color: myYellow,
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.only(left: 10),
+            child: const Text(
+              "PANORAMICA",
+              style: TextStyle(fontSize: 22, color: myGrey),
+            ),
+          ),
+          Container(
+              color: Colors.grey,
+              height: 2.0,
+          ),
+          _buildRow("Dati personali", ()=>{}),
+          Container(
+            color: myGold,
+            height: 2.0,
+          ),
+          _buildRow("Prenotazioni", ()=>{}, notifichePrenotazioni),
+          Container(
+            color: myGold,
+            height: 2.0,
+          ),
+          _buildRow("Acquisti in app", ()=>{}, notificheProdotti),
+          Container(
+            color: myGold,
+            height: 2.0,
+          ),
+          _buildRow("Rilascia feedback", (){print('Feed');}),
+          Container(
+            color: myGold,
+            height: 2.0,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRow(String text, VoidCallback onTap, [int notifiche = 0]) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        height: 50,
+        color: myYellow,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Text(text, style: const TextStyle(fontSize: 19, color: myGrey)),
+                if (notifiche > 0)
+                  Container(
+                    margin: const EdgeInsets.only(left: 15),
+                    padding: const EdgeInsets.all(5),
+                    decoration: const BoxDecoration(
+                      color: myBordeaux,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      notifiche.toString(),
+                      style: const TextStyle(color: myGold, fontSize: 13),
+                    ),
+                  ),
+              ],
+            ),
+            const Icon(Icons.arrow_forward_ios, color: Colors.black),
+          ],
+        ),
+      ),
+    );
+  }
+
+}
+

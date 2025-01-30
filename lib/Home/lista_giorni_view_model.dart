@@ -117,7 +117,10 @@ class ListaGiorniViewModel extends ChangeNotifier{
   Future<List<Map<DateTime, List<Map<String, String>>>>> _generaListaOccupati(
       DateTime oggi, int giorniTotali) async {
     final List<Map<DateTime, List<Map<String, String>>>> listaOccupati = [];
-    final ultimo = oggi.add(Duration(days: giorniTotali));
+    final oggiFormatted = normalizedDate(oggi);
+    final ultimoFormatted = normalizedDate(oggi.add(Duration(days: giorniTotali)));
+
+
 
     try {
       final giorni = await db.collection('occupati').get();
@@ -125,8 +128,13 @@ class ListaGiorniViewModel extends ChangeNotifier{
       for (var giorno in giorni.docs) {
         final giornoCorrente = normalizedDate(DateFormat('dd-MM-yyyy').parse(giorno.id));
 
-        if (giornoCorrente.isAfter(oggi) &&
-            giornoCorrente.isBefore(ultimo)) {
+        //print('Giorno corr: $giornoCorrente');
+
+        if (
+          giornoCorrente.isAtSameMomentAs(oggiFormatted) ||
+          (giornoCorrente.isAfter(oggiFormatted) && giornoCorrente.isBefore(ultimoFormatted)) ||
+          giornoCorrente.isAtSameMomentAs(ultimoFormatted)
+        ) {
           final slotOrari = <Map<String, String>>[];
           final dati = giorno.data();
 
@@ -136,6 +144,7 @@ class ListaGiorniViewModel extends ChangeNotifier{
             slotOrari.add({"inizio": orarioInizio, "fine": orarioFine});
           }
           listaOccupati.add({giornoCorrente: slotOrari});
+          //print("Rimosso");
         }
       }
     } catch (e) {

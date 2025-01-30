@@ -22,7 +22,7 @@ class AccountNavigatorState extends State<AccountNavigator> {
             if (settings.name == "/detailsUpdates") {
               return Account();
             }
-            return Account();
+            return AccountScreen();
           },
         );
       },

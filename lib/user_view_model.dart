@@ -252,12 +252,13 @@ class UserViewModel extends ChangeNotifier {
           utenteRiferimento,
           {
             "appuntamenti": FieldValue.arrayUnion([
-              appuntamentoPath.collection("app").doc(chiave).path,
+              appuntamentoPath.collection("app").doc(chiave),
             ])
           },
         );
       });
 
+      await caricaDati();
       _isLoading = false;
       notifyListeners();
       onSuccess();

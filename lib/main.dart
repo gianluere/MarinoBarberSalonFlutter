@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:marino_barber_salon_flutter/Home/lista_giorni_view_model.dart';
 import 'package:marino_barber_salon_flutter/Home/lista_servizi_view_model.dart';
+import 'package:marino_barber_salon_flutter/Home/notifiche_view_model.dart';
 import 'package:marino_barber_salon_flutter/main_wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -35,8 +36,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserViewModel()),
+        ChangeNotifierProvider(create: (_) => NotificheViewModel()),
         ChangeNotifierProvider(create: (_) => ListaServiziViewModel()),
-        ChangeNotifierProvider(create: (_) => ListaGiorniViewModel())
+        ChangeNotifierProvider(create: (_) => ListaGiorniViewModel()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

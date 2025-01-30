@@ -1,4 +1,6 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class NewUser{
   String nome;
   String cognome;
@@ -6,7 +8,7 @@ class NewUser{
   int eta;
   String password;
   String telefono;
-  List<dynamic> appuntamenti;
+  List<DocumentReference> appuntamenti;
 
   NewUser(
       {required this.nome,
