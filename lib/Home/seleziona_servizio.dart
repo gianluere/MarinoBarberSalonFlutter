@@ -138,7 +138,7 @@ class CardAppuntamento extends StatelessWidget {
         ),
         color: myYellow,
         child: Container(
-          height: 140.0,
+          height: 130.0,
           padding: const EdgeInsets.all(10.0),
           decoration: BoxDecoration(
             border: Border.all(color: myGold, width: 2.0),

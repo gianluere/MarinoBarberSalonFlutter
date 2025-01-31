@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
+import 'Home/appuntamento.dart';
 import 'Home/user.dart';
 
 class UserViewModel extends ChangeNotifier {
@@ -12,11 +14,13 @@ class UserViewModel extends ChangeNotifier {
   String? _errorMessage;
   UserFirebase? _dati;
   bool _isLoading = true;
+  List<Appuntamento>? _listaAppuntamenti;
 
   User? get currentUser => _currentUser;
   String? get errorMessage => _errorMessage;
   UserFirebase? get dati => _dati;
   bool get isLoading => _isLoading;
+  List<Appuntamento>? get listaAppuntamenti => _listaAppuntamenti;
 
   UserViewModel() {
 
@@ -45,6 +49,7 @@ class UserViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     _dati = await caricaDati();
+    sincronizzaPrenotazioni();
 
     print("Nome: ${_dati?.nome}");
     print("Cognome: ${_dati?.cognome}");
@@ -270,6 +275,110 @@ class UserViewModel extends ChangeNotifier {
       print("Errore durante l'aggiunta dell'appuntamento: $e");
     }
   }
+
+  Future<void> updateDati(
+      String nome,
+      String cognome,
+      int eta,
+      String telefono,
+      )
+  async {
+
+    if (_currentUser != null){
+      final daAggiornare = {
+        "nome": nome,
+        "cognome": cognome,
+        "eta": eta,
+        "telefono": telefono,
+      };
+
+      _isLoading = true;
+      notifyListeners();
+
+      _db.collection("utenti")
+          .doc(_currentUser?.email)
+          .update(daAggiornare)
+          .then((_) async {
+        _currentUser = _auth.currentUser;
+        await caricaDati();
+        _isLoading = false;
+        notifyListeners();
+
+      }).catchError((error) {
+        debugPrint("Errore nell'aggiornamento: $error");
+      });
+    }
+
+
+  }
+
+
+  Future<List<Appuntamento>> _recuperaDocumenti(List<DocumentReference> listaAppuntamenti) async {
+    List<Appuntamento> appuntamenti = [];
+
+    for (var document in listaAppuntamenti) {
+      var result = await document.get();
+      if (result.exists) {
+        var appuntamento = Appuntamento.fromMap(result.data() as Map<String, dynamic>);
+        appuntamenti.add(appuntamento);
+      }
+    }
+
+    return appuntamenti;
+  }
+
+  Future<void> sincronizzaPrenotazioni() async {
+
+    if (_currentUser != null){
+      _db.collection("utenti")
+          .doc(currentUser?.email)
+          .snapshots()
+          .listen((snapshot) async {
+        if (!snapshot.exists) return;
+
+        final List<dynamic>? appuntamentiList = snapshot.data()?["appuntamenti"] as List<dynamic>?;
+
+        if (appuntamentiList != null) {
+          _isLoading = true;
+          notifyListeners();
+          List<Appuntamento> listApp = await _recuperaDocumenti(appuntamentiList.cast<DocumentReference>());
+
+          // Rimozione spazi extra nella descrizione
+          for (var app in listApp) {
+            app.descrizione = app.descrizione.replaceAll(RegExp(r'\s+'), " ");
+          }
+
+          // Formattazione e ordinamento delle date
+          final dateFormatter = DateFormat("dd-MM-yyyy");
+          final timeFormatter = DateFormat("HH:mm");
+
+          listApp.sort((a, b) {
+            final dateA = dateFormatter.parse(a.data);
+            final dateB = dateFormatter.parse(b.data);
+
+            if (dateA != dateB) {
+              return dateB.compareTo(dateA); // Ordina per data decrescente
+            }
+
+            final timeA = timeFormatter.parse(a.orarioInizio);
+            final timeB = timeFormatter.parse(b.orarioInizio);
+            return timeB.compareTo(timeA); // Ordina per ora decrescente
+          });
+
+          _listaAppuntamenti = listApp;
+          _currentUser = _auth.currentUser;
+          _dati = await caricaDati();
+          _isLoading = false;
+          notifyListeners();
+        }
+      }, onError: (error) {
+        debugPrint("Errore Firestore: $error");
+      });
+    }
+
+  }
+
+
 
 
 

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:marino_barber_salon_flutter/Account/account.dart';
+import 'package:marino_barber_salon_flutter/Account/dati_personali.dart';
+
+import '../Account/prenotazioni.dart';
 
 class AccountNavigator extends StatefulWidget {
   const AccountNavigator({super.key});
@@ -19,8 +22,10 @@ class AccountNavigatorState extends State<AccountNavigator> {
         return MaterialPageRoute(
           settings: settings,
           builder: (BuildContext context) {
-            if (settings.name == "/detailsUpdates") {
-              return Account();
+            if (settings.name == "/dati_personali") {
+              return DatiPersonali();
+            } else if (settings.name == "/prenotazioni"){
+              return Prenotazioni();
             }
             return AccountScreen();
           },

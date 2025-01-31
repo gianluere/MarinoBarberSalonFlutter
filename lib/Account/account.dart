@@ -92,7 +92,6 @@ class AccountScreen extends StatelessWidget {
       appBar: MyAppBar('ACCOUNT', false),
       backgroundColor: myGrey,
       body: Column(
-
         children: [
           Container(
             width: double.infinity,
@@ -109,12 +108,12 @@ class AccountScreen extends StatelessWidget {
               color: Colors.grey,
               height: 2.0,
           ),
-          _buildRow("Dati personali", ()=>{}),
+          _buildRow("Dati personali", (){Navigator.of(context).pushNamed('/dati_personali');}),
           Container(
             color: myGold,
             height: 2.0,
           ),
-          _buildRow("Prenotazioni", ()=>{}, notifichePrenotazioni),
+          _buildRow("Prenotazioni", (){Navigator.of(context).pushNamed('/prenotazioni');}, notifichePrenotazioni),
           Container(
             color: myGold,
             height: 2.0,
