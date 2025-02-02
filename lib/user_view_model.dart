@@ -14,12 +14,14 @@ class UserViewModel extends ChangeNotifier {
   String? _errorMessage;
   UserFirebase? _dati;
   bool _isLoading = true;
+  bool _isLoadingPrenotazioni = true;
   List<Appuntamento>? _listaAppuntamenti;
 
   User? get currentUser => _currentUser;
   String? get errorMessage => _errorMessage;
   UserFirebase? get dati => _dati;
   bool get isLoading => _isLoading;
+  bool get isLoadingPrenotazioni => _isLoadingPrenotazioni;
   List<Appuntamento>? get listaAppuntamenti => _listaAppuntamenti;
 
   UserViewModel() {
@@ -339,7 +341,7 @@ class UserViewModel extends ChangeNotifier {
         final List<dynamic>? appuntamentiList = snapshot.data()?["appuntamenti"] as List<dynamic>?;
 
         if (appuntamentiList != null) {
-          _isLoading = true;
+          _isLoadingPrenotazioni = true;
           notifyListeners();
           List<Appuntamento> listApp = await _recuperaDocumenti(appuntamentiList.cast<DocumentReference>());
 
@@ -368,7 +370,7 @@ class UserViewModel extends ChangeNotifier {
           _listaAppuntamenti = listApp;
           _currentUser = _auth.currentUser;
           _dati = await caricaDati();
-          _isLoading = false;
+          _isLoadingPrenotazioni = false;
           notifyListeners();
         }
       }, onError: (error) {
@@ -377,8 +379,6 @@ class UserViewModel extends ChangeNotifier {
     }
 
   }
-
-
 
 
 

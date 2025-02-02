@@ -60,15 +60,11 @@ class NotificheViewModel extends ChangeNotifier {
     int totale = 0;
 
     for (var appuntamento in appuntamenti) {
-      final giornoApp = DateFormat("dd-MM-yyyy").parse(appuntamento.data);
-      final oraApp = TimeOfDay(
-        hour: int.parse(appuntamento.orarioInizio.substring(0, 2)),
-        minute: int.parse(appuntamento.orarioInizio.substring(3, 5)),
-      );
 
-      if (oggi.isBefore(giornoApp) ||
-          (oggi.year == giornoApp.year && oggi.month == giornoApp.month && oggi.day == giornoApp.day &&
-              TimeOfDay.now().hour < oraApp.hour)) {
+      DateTime giornoApp = DateFormat("dd-MM-yyyy HH:mm").parse("${appuntamento.data} ${appuntamento.orarioInizio}");
+
+
+      if (oggi.isBefore(giornoApp)) {
         totale++;
       }
     }

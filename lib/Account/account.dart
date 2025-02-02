@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marino_barber_salon_flutter/Home/notifiche_view_model.dart';
 import 'package:marino_barber_salon_flutter/Navigations/home_navigations.dart';
 import 'package:marino_barber_salon_flutter/Navigations/shop_navigations.dart';
 import 'package:marino_barber_salon_flutter/app_bar.dart';
@@ -76,18 +77,19 @@ class _AccountState extends State<Account>{
 
 class AccountScreen extends StatelessWidget {
 
-  final int notifichePrenotazioni;
   final int notificheProdotti;
 
   const AccountScreen({
     super.key,
 
-    this.notifichePrenotazioni = 0,
     this.notificheProdotti = 0,
   });
 
   @override
   Widget build(BuildContext context) {
+
+    final notificheViewModel = Provider.of<NotificheViewModel>(context);
+
     return Scaffold(
       appBar: MyAppBar('ACCOUNT', false),
       backgroundColor: myGrey,
@@ -113,7 +115,7 @@ class AccountScreen extends StatelessWidget {
             color: myGold,
             height: 2.0,
           ),
-          _buildRow("Prenotazioni", (){Navigator.of(context).pushNamed('/prenotazioni');}, notifichePrenotazioni),
+          _buildRow("Prenotazioni", (){Navigator.of(context).pushNamed('/prenotazioni');}, notificheViewModel.notifichePrenotazioni),
           Container(
             color: myGold,
             height: 2.0,
@@ -123,7 +125,7 @@ class AccountScreen extends StatelessWidget {
             color: myGold,
             height: 2.0,
           ),
-          _buildRow("Rilascia feedback", (){print('Feed');}),
+          _buildRow("Rilascia feedback", (){Navigator.of(context).pushNamed('/recensioni');}),
           Container(
             color: myGold,
             height: 2.0,
@@ -149,7 +151,7 @@ class AccountScreen extends StatelessWidget {
                 if (notifiche > 0)
                   Container(
                     margin: const EdgeInsets.only(left: 15),
-                    padding: const EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(10),
                     decoration: const BoxDecoration(
                       color: myBordeaux,
                       shape: BoxShape.circle,

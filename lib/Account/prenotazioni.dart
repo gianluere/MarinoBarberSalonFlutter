@@ -17,8 +17,8 @@ class Prenotazioni extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: myGrey,
-      appBar: MyAppBar('PRENOTAZIONi', true),
-      body: userViewModel.isLoading
+      appBar: MyAppBar('PRENOTAZIONI', true),
+      body: userViewModel.isLoadingPrenotazioni
         ? Center(child: CircularProgressIndicator(color: myGold,),)
         : listaPrenotazioni!.isNotEmpty
           ? Padding(
@@ -69,10 +69,24 @@ class CardPrenotazione extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     DateTime oggi = DateTime.now();
-    DateTime giornoApp = DateFormat("dd-MM-yyyy").parse(appuntamento.data);
-    DateTime oraApp = DateFormat("HH:mm").parse(appuntamento.orarioInizio);
+    DateTime giornoApp = DateFormat("dd-MM-yyyy HH:mm").parse("${appuntamento.data} ${appuntamento.orarioInizio}");
+    //DateTime oraApp = DateFormat("HH:mm").parse(appuntamento.orarioInizio);
 
-    bool attivo = oggi.isBefore(giornoApp) || (oggi.year == giornoApp.year && oggi.month == giornoApp.month && oggi.day == giornoApp.day && oggi.isBefore(oraApp));
+    print('Oggi: $oggi');
+    print('GiornoAPP: $giornoApp');
+    //print('Ora APP: $oraApp');
+
+
+    bool attivo = oggi.isBefore(giornoApp); // || (oggi.year == giornoApp.year && oggi.month == giornoApp.month && oggi.day == giornoApp.day && oggi.hour <= oraApp.hour && oggi.minute <= oraApp.minute);
+/*
+    bool attivo;
+
+
+    if(oggi.isBefore(giornoApp)){
+      attivo = true;
+    }else if(oggi.)
+
+ */
 
     return Card(
       color: attivo ? myYellow : Colors.grey,
