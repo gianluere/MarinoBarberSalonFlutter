@@ -40,7 +40,7 @@ class SelezionaServizioCapelli extends StatelessWidget {
     final listaServiziViewModel = Provider.of<ListaServiziViewModel>(context);
 
     return listaServiziViewModel.isLoading
-      ? CircularProgressIndicator()
+      ? Center(child: CircularProgressIndicator(color: myGold,),)
       : Contenuto(
         servizi: listaServiziViewModel.listaServizi.where((s) => s.tipo == "Capelli").toList(),
         titolo: "Capelli",

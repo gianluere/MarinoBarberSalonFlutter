@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:marino_barber_salon_flutter/Account/account.dart';
+import 'package:marino_barber_salon_flutter/Account/aggiungi_recensione.dart';
 import 'package:marino_barber_salon_flutter/Account/dati_personali.dart';
 import 'package:marino_barber_salon_flutter/Account/recensioni.dart';
 
@@ -29,6 +30,8 @@ class AccountNavigatorState extends State<AccountNavigator> {
               return Prenotazioni();
             } else if (settings.name == '/recensioni'){
               return Recensioni();
+            } else if (settings.name == '/inserisci_recensione'){
+              return InserisciRecensione();
             }
             return AccountScreen();
           },

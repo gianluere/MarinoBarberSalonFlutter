@@ -33,7 +33,9 @@ class Recensioni extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 20, right: 15),
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/inserisci_recensione');
+                  },
                   child: Container(
                     decoration: BoxDecoration(
                       color: myYellow,

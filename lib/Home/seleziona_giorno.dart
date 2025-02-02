@@ -139,7 +139,7 @@ class _SelezionaGiornoState extends State<SelezionaGiorno> {
 
           // Bottone per procedere
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 26.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -162,7 +162,7 @@ class _SelezionaGiornoState extends State<SelezionaGiorno> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 14.0)
+                  padding: EdgeInsets.symmetric(vertical: 15.0)
                 ),
                 child: const Text(
                   'PROSEGUI',

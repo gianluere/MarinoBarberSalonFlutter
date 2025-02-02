@@ -35,7 +35,8 @@ class ListaRecensioniViewModel extends ChangeNotifier {
   }
 
 
-  Future<void> inserisciRecensione(Recensione recensione) async {
+  Future<void> inserisciRecensione(
+      {required Recensione recensione, required Function onCompleted}) async {
 
     _isLoading = true;
     notifyListeners();
@@ -45,6 +46,9 @@ class ListaRecensioniViewModel extends ChangeNotifier {
       'stelle': recensione.stelle,
       'descrizione': recensione.descrizione,
     }).then((_) {
+      _isLoading = true;
+      notifyListeners();
+      onCompleted();
       caricaListaRecensioni(); // Aggiorna la lista dopo l'inserimento
     }).catchError((error) {
       _isLoading = false;
