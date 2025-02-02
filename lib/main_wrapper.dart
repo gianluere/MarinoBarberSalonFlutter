@@ -44,83 +44,84 @@ class MainWrapperState extends State<MainWrapper> {
 
     return WillPopScope(
       onWillPop: _systemBackButtonPressed,
-      child: Scaffold(
-        bottomNavigationBar: Column(
-          mainAxisSize: MainAxisSize.min, // Assicurati che la colonna prenda solo lo spazio necessario
-          children: [
-            Container(
-              height: 2.0, // Spessore della linea
-              color: myWhite, // Colore della linea
-            ),
-            NavigationBar(
-              onDestinationSelected: (int index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-              selectedIndex: _selectedIndex,
-              destinations: [
-                NavigationDestination(
-                  selectedIcon: Icon(Icons.cut, color: myBordeaux, size: 42),
-                  icon: Icon(Icons.content_cut_outlined, color: myWhite, size: 42),
-                  label: '',
+      child: ValueListenableBuilder<String?>(
+        valueListenable: accountRouteObserver.currentRoute,
+        builder: (context, currentRoute, child) {
+          return Scaffold(
+            resizeToAvoidBottomInset: currentRoute == '/inserisci_recensione' ? false : true,
+            bottomNavigationBar: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  height: 2.0,
+                  color: myWhite,
                 ),
-                NavigationDestination(
-                  selectedIcon: badges.Badge(
-                    badgeContent: Text(
-                      '${notificheViewModel.notifichePrenotazioni}',  // Mostra il numero di notifiche
-                      style: TextStyle(color: myGold, fontSize: 12),
+                NavigationBar(
+                  onDestinationSelected: (int index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  selectedIndex: _selectedIndex,
+                  destinations: [
+                    NavigationDestination(
+                      selectedIcon: Icon(Icons.cut, color: myBordeaux, size: 42),
+                      icon: Icon(Icons.content_cut_outlined, color: myWhite, size: 42),
+                      label: '',
                     ),
-                    showBadge: notificheViewModel.notifichePrenotazioni > 0,  // Mostra solo se notifiche > 0
-                    badgeStyle: badges.BadgeStyle(
-                      badgeColor: myBordeaux, // Sfondo del badge
-                      padding: EdgeInsets.all(6),
+                    NavigationDestination(
+                      selectedIcon: badges.Badge(
+                        badgeContent: Text(
+                          '${notificheViewModel.notifichePrenotazioni}',
+                          style: TextStyle(color: myGold, fontSize: 12),
+                        ),
+                        showBadge: notificheViewModel.notifichePrenotazioni > 0,
+                        badgeStyle: badges.BadgeStyle(
+                          badgeColor: myBordeaux,
+                          padding: EdgeInsets.all(6),
+                        ),
+                        position: badges.BadgePosition.topEnd(top: -3, end: -3),
+                        child: Icon(Icons.account_circle_outlined, color: myBordeaux, size: 42),
+                      ),
+                      icon: badges.Badge(
+                        badgeContent: Text(
+                          '${notificheViewModel.notifichePrenotazioni}',
+                          style: TextStyle(color: myGold, fontSize: 12),
+                        ),
+                        showBadge: notificheViewModel.notifichePrenotazioni > 0,
+                        badgeStyle: badges.BadgeStyle(
+                          badgeColor: myBordeaux,
+                          padding: EdgeInsets.all(6),
+                        ),
+                        position: badges.BadgePosition.topEnd(top: -3, end: -3),
+                        child: Icon(Icons.account_circle_outlined, color: myWhite, size: 42),
+                      ),
+                      label: '',
                     ),
-                    position: badges.BadgePosition.topEnd(top: -3, end: -3), // Posizione sopra l'icona
-                    child: Icon(Icons.account_circle_outlined, color: myBordeaux, size: 42),
-                  ),
-                  icon: badges.Badge(
-                    badgeContent: Text(
-                      '${notificheViewModel.notifichePrenotazioni}',
-                      style: TextStyle(color: myGold, fontSize: 12),
+                    NavigationDestination(
+                      selectedIcon: Icon(Icons.shopping_cart, color: myBordeaux, size: 42),
+                      icon: Icon(Icons.shopping_cart_outlined, color: myWhite, size: 42),
+                      label: '',
                     ),
-                    showBadge: notificheViewModel.notifichePrenotazioni > 0,
-                    badgeStyle: badges.BadgeStyle(
-                      badgeColor: myBordeaux,
-                      padding: EdgeInsets.all(6),
-                    ),
-                    position: badges.BadgePosition.topEnd(top: -3, end: -3),
-                    child: Icon(Icons.account_circle_outlined, color: myWhite, size: 42),
-                  ),
-                  label: '',
-                ),
-                NavigationDestination(
-                  selectedIcon: Icon(Icons.shopping_cart, color: myBordeaux, size: 42),
-                  icon: Icon(Icons.shopping_cart_outlined, color: myWhite, size: 42),
-                  label: '',
+                  ],
+                  backgroundColor: myGrey,
+                  indicatorColor: Colors.transparent,
                 ),
               ],
-              backgroundColor: myGrey,
-              indicatorColor: Colors.transparent,
             ),
-          ],
-        ),
-        body: SafeArea(
-          top: false,
-          child: IndexedStack(
-            index: _selectedIndex,
-            children: const <Widget>[
-              /// First Route
-              HomeNavigator(),
-
-              /// Second Route
-              AccountNavigator(),
-
-              /// Thhird route
-              ShopNavigator()
-            ],
-          ),
-        ),
+            body: SafeArea(
+              top: false,
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: const <Widget>[
+                  HomeNavigator(),
+                  AccountNavigator(),
+                  ShopNavigator(),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

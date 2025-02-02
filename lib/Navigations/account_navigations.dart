@@ -20,6 +20,7 @@ class AccountNavigatorState extends State<AccountNavigator> {
   Widget build(BuildContext context) {
     return Navigator(
       key: accountNavigatorKey,
+      observers: [accountRouteObserver],
       onGenerateRoute: (RouteSettings settings) {
         return MaterialPageRoute(
           settings: settings,
@@ -40,3 +41,23 @@ class AccountNavigatorState extends State<AccountNavigator> {
     );
   }
 }
+
+
+class AccountRouteObserver extends NavigatorObserver {
+  //String? currentRoute;
+  final ValueNotifier<String?> currentRoute = ValueNotifier<String?>(null);
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    currentRoute.value = route.settings.name;
+    debugPrint("Account Navigator Pushed: ${route.settings.name}");
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    currentRoute.value = previousRoute?.settings.name;
+    debugPrint("Account Navigator Popped to: ${previousRoute?.settings.name}");
+  }
+}
+
+final AccountRouteObserver accountRouteObserver = AccountRouteObserver();
