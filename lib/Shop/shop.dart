@@ -51,7 +51,7 @@ class _ShopScreenState extends State<ShopScreen> {
               padding: const EdgeInsets.all(12),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                mainAxisSpacing: 20,
+                mainAxisSpacing: 15,
                 crossAxisSpacing: 20,
                 childAspectRatio: 0.8,
               ),
@@ -81,32 +81,75 @@ class GridItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
+          SizedBox(
+            height: 160,
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: myGold, width: 2),
                 color: prodotto.quantita == 0 ? Colors.grey[800] : Colors.grey,
-                image: DecorationImage(
+
+                /*
+                DecorationImage(
                   image: NetworkImage(prodotto.immagine), // L'URL è già in Firestore
                   fit: BoxFit.cover,
                   colorFilter: prodotto.quantita == 0
                       ? const ColorFilter.mode(Colors.grey, BlendMode.saturation) // Scala di grigi se quantità = 0
                       : null,
                 ),
+
+                 */
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: 
+                  Image.network(
+                    prodotto.immagine,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) {
+                      return child;
+                    }else {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: myGold,
+                        ),
+                      );
+                    }
+                  },
+                    errorBuilder: (context, exception, stackTrace) {
+                      return Image.asset(
+                        'assets/placeholder.png',
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      );
+                    },
+                  ),
               ),
             ),
           ),
           const SizedBox(height: 5),
-          Text(
-            prodotto.nome,
-            style: const TextStyle(color: myWhite, fontSize: 18),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          Text(
-            "${prodotto.prezzo.toStringAsFixed(2)}€",
-            style: const TextStyle(color: myWhite, fontSize: 18),
+          IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Text(
+                    prodotto.nome,
+                    style: const TextStyle(color: myWhite, fontSize: 14),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 10), // Spazio tra nome e prezzo
+                Text(
+                  "${prodotto.prezzo.toStringAsFixed(2)}€",
+                  style: const TextStyle(color: myWhite, fontSize: 14),
+                ),
+              ],
+            ),
           ),
         ],
       ),
