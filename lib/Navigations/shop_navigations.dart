@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marino_barber_salon_flutter/Shop/prodotto_selezionato.dart';
 import 'package:marino_barber_salon_flutter/Shop/seleziona_shop.dart';
 
 import '../Shop/shop.dart';
@@ -23,6 +24,8 @@ class ShopNavigatorState extends State<ShopNavigator> {
           builder: (BuildContext context) {
             if (settings.name == "/shop") {
               return ShopScreen();
+            } else if (settings.name == '/prodotto_shop'){
+              return ProdottoShop();
             }
             return SelezionaShop();
           },

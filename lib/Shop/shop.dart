@@ -77,7 +77,7 @@ class GridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => {},
+      onTap: () => {Navigator.of(context).pushNamed('/prodotto_shop', arguments: prodotto)},
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

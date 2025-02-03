@@ -9,7 +9,7 @@ class SelezionaShop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppBar("Shop", false),
+      appBar: MyAppBar("SHOP", false),
       backgroundColor: myGrey,
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
