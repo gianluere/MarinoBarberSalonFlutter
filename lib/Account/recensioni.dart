@@ -31,7 +31,7 @@ class Recensioni extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 20, right: 15),
+                padding: const EdgeInsets.only(top: 20, right: 15, bottom: 10),
                 child: GestureDetector(
                   onTap: () {
                     Navigator.of(context).pushNamed('/inserisci_recensione');

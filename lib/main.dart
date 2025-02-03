@@ -4,13 +4,14 @@ import 'package:marino_barber_salon_flutter/Account/lista_recensioni_view_model.
 import 'package:marino_barber_salon_flutter/Home/lista_giorni_view_model.dart';
 import 'package:marino_barber_salon_flutter/Home/lista_servizi_view_model.dart';
 import 'package:marino_barber_salon_flutter/Home/notifiche_view_model.dart';
+import 'package:marino_barber_salon_flutter/Shop/lista_prodotti_view_model.dart';
 import 'package:marino_barber_salon_flutter/main_wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:marino_barber_salon_flutter/login.dart';
 import 'user_view_model.dart';
-import 'Home/home.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 void main() async{
@@ -22,6 +23,11 @@ void main() async{
   );
 
   await initializeDateFormatting('it_IT', null);
+
+  await Supabase.initialize(
+    url: 'https://dboogadeyqtgiirwnopm.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRib29nYWRleXF0Z2lpcndub3BtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY0NTMyMDQsImV4cCI6MjA1MjAyOTIwNH0.5AERHBZ3WTKr9KOzTNQRWp-xCgNserTU1j1dyJTpIMY',
+  );
 
   runApp(const MyApp());
 }
@@ -40,7 +46,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NotificheViewModel()),
         ChangeNotifierProvider(create: (_) => ListaServiziViewModel()),
         ChangeNotifierProvider(create: (_) => ListaGiorniViewModel()),
-        ChangeNotifierProvider(create: (_) => ListaRecensioniViewModel())
+        ChangeNotifierProvider(create: (_) => ListaRecensioniViewModel()),
+        ChangeNotifierProvider(create: (_) => ListaProdottiViewModel())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

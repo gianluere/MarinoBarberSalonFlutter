@@ -30,19 +30,13 @@ class Prenotazioni extends StatelessWidget {
                 return CardPrenotazione(
                   appuntamento: appuntamento,
                   annulla: () {
-                    /*
+
                     userViewModel.annullaPrenotazione(
-                      appuntamento,
-                      onSuccess: () {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Prenotazione annullata!")));
-                      },
-                      onError: () {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Errore di connessione")));
-                      },
+                        appuntamento,
+                            () {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Errore di connessione")));
+                        }
                     );
-
-                     */
-
 
                   },
                 );
@@ -100,11 +94,11 @@ class CardPrenotazione extends StatelessWidget {
         ),
         child: ListTile(
           splashColor: myGold,
-          title: Text(appuntamento.servizio, style: TextStyle(fontSize: 20)),
+          title: Text(appuntamento.servizio, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 20)),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(appuntamento.descrizione, style: TextStyle(fontSize: 14)),
+              Text(appuntamento.descrizione, maxLines: 3, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14)),
               SizedBox(height: 6),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -128,7 +122,7 @@ class CardPrenotazione extends StatelessWidget {
 void showAnnullaDialog(BuildContext context, VoidCallback annulla) {
   showModalBottomSheet(
     context: context,
-    backgroundColor: Colors.grey[900],
+    backgroundColor: myGrey,
     builder: (context) => Padding(
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
       child: Column(

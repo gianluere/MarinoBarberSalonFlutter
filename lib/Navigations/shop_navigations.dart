@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:marino_barber_salon_flutter/Account/account.dart';
-import 'package:marino_barber_salon_flutter/Shop/Shop.dart';
+import 'package:marino_barber_salon_flutter/Shop/seleziona_shop.dart';
+
+import '../Shop/shop.dart';
 
 class ShopNavigator extends StatefulWidget {
   const ShopNavigator({super.key});
@@ -20,10 +21,10 @@ class ShopNavigatorState extends State<ShopNavigator> {
         return MaterialPageRoute(
           settings: settings,
           builder: (BuildContext context) {
-            if (settings.name == "/detailsUpdates") {
-              return Shop();
+            if (settings.name == "/shop") {
+              return ShopScreen();
             }
-            return Shop();
+            return SelezionaShop();
           },
         );
       },

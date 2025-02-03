@@ -381,5 +381,84 @@ class UserViewModel extends ChangeNotifier {
   }
 
 
+  Future<void> annullaPrenotazione(
+      Appuntamento appuntamento,
+      VoidCallback errore
+      ) async {
+
+    _isLoading = true;
+    if (_currentUser == null) {
+      _isLoading = false;
+      notifyListeners();
+      errore();
+      debugPrint("Errore: Utente non autenticato.");
+      return;
+    }
+
+    final String emailUtente = _currentUser!.email ?? '';
+    final DocumentReference appuntamentoPath =
+    _db.collection("appuntamenti").doc(appuntamento.data);
+    final DocumentReference occupatiPath =
+    _db.collection("occupati").doc(appuntamento.data);
+    final DocumentReference utenteRiferimento =
+    _db.collection("utenti").doc(emailUtente);
+    final DocumentReference totalePath =
+    appuntamentoPath.collection("totale").doc("count");
+
+    final String chiave = "${appuntamento.orarioInizio}-${appuntamento.orarioFine}";
+    final DocumentReference appuntamentoReference =
+    appuntamentoPath.collection("app").doc(chiave);
+
+    try {
+      await _db.runTransaction((transaction) async {
+        final appuntamentoSnapshot = await transaction.get(appuntamentoPath);
+        final occupatiSnapshot = await transaction.get(occupatiPath);
+        final totaleSnapshot = await transaction.get(totalePath);
+        final userSnapshot = await transaction.get(utenteRiferimento);
+
+        // Cancella l'appuntamento se esiste
+        if (appuntamentoSnapshot.exists) {
+          transaction.delete(appuntamentoReference);
+        }
+
+        // Aggiorna il documento "occupati" rimuovendo la chiave
+        if (occupatiSnapshot.exists) {
+          transaction.update(occupatiPath, {chiave: FieldValue.delete()});
+        }
+
+        // Rimuove il riferimento appuntamento dall'utente
+        if (userSnapshot.exists) {
+          transaction.update(
+              utenteRiferimento,
+              {"appuntamenti": FieldValue.arrayRemove([appuntamentoReference])}
+          );
+        }
+
+        // Aggiorna il conteggio nella collezione "totale"
+        if (totaleSnapshot.exists) {
+          final int currentCount = (totaleSnapshot.get("count") ?? 0) as int;
+          if (currentCount > 0) {
+            transaction.update(totalePath, {"count": currentCount - 1});
+          } else {
+            transaction.update(totalePath, {"count": 0});
+          }
+        } else {
+          // Se il documento non esiste, lo crea con count = 0
+          transaction.set(totalePath, {"count": 0});
+        }
+      });
+
+      _isLoading = false;
+      notifyListeners();
+      debugPrint("Prenotazione annullata con successo e totale aggiornato.");
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      errore();
+      debugPrint("Errore durante l'annullamento della prenotazione: $e");
+    }
+  }
+
+
 
 }
