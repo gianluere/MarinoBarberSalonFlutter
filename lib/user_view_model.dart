@@ -576,23 +576,21 @@ class UserViewModel extends ChangeNotifier {
         print("Prenotato: ${prodottoPrenotato.quantita}");
 
         DocumentReference? prodottoRef = prodottoPrenotato.prodotto;
-        if (prodottoRef != null) {
-          // Carica il prodotto associato
-          Future<void> task = prodottoRef.get().then((prodottoDoc) {
-            if (prodottoDoc.exists) {
-              Prodotto prodotto = Prodotto.fromFirestore(prodottoDoc);
-              print("Prodotto associato: ${prodotto.nome}");
+        // Carica il prodotto associato
+        Future<void> task = prodottoRef.get().then((prodottoDoc) {
+          if (prodottoDoc.exists) {
+            Prodotto prodotto = Prodotto.fromFirestore(prodottoDoc);
+            print("Prodotto associato: ${prodotto.nome}");
 
-              listaProdottiAssociati.add({
-                "prodottoPrenotato": prodottoPrenotato,
-                "prodotto": prodotto,
-              });
+            listaProdottiAssociati.add({
+              "prodottoPrenotato": prodottoPrenotato,
+              "prodotto": prodotto,
+            });
+          }
+        });
+
+        tasks.add(task);
             }
-          });
-
-          tasks.add(task);
-        }
-      }
 
       // Attendi il completamento di tutti i task
       await Future.wait(tasks);
@@ -610,6 +608,54 @@ class UserViewModel extends ChangeNotifier {
       print("Errore nel caricamento dei prodotti prenotati: $e");
     }
   }
+
+
+  Future<void> annullaPrenotazioneProdotto(ProdottoPrenotato prodottoPren) async {
+    try {
+
+      _isLoading = true;
+      notifyListeners();
+
+      // Trova il documento da eliminare
+      QuerySnapshot querySnapshot = await _db
+          .collection("prodottiPrenotati")
+          .where("prodotto", isEqualTo: prodottoPren.prodotto)
+          .where("quantita", isEqualTo: prodottoPren.quantita)
+          .where("utente", isEqualTo: prodottoPren.utente)
+          .where("data", isEqualTo: prodottoPren.data)
+          .where("stato", isEqualTo: prodottoPren.stato)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        for (var document in querySnapshot.docs) {
+          await document.reference.delete();
+        }
+      }
+
+      // Aggiorna la quantità del prodotto SENZA transazione
+      DocumentReference prodottoReference = prodottoPren.prodotto;
+
+      DocumentSnapshot snapshot = await prodottoReference.get();
+      if (snapshot.exists) {
+        int quantitaAttuale = (snapshot["quantita"] as num?)?.toInt() ?? 0;
+        int nuovaQuantita = quantitaAttuale + prodottoPren.quantita;
+
+        await prodottoReference.update({"quantita": nuovaQuantita});
+      }
+
+      // Dopo l'aggiornamento ricarica la lista dei prodotti prenotati
+      await caricaProdottiPrenotati();
+
+
+      print("Aggiornamento completato con successo.");
+        } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      print("Errore: ${e.toString()}");
+    }
+  }
+
+
 
 
 

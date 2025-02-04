@@ -45,22 +45,25 @@ class ProdottiPrenotati extends StatelessWidget {
                       return ProdPrenItem(
                         item: userViewModel.listaProdottiPrenotati[index],
                         onDelete: () {
-                          //userViewModel.annullaPrenotazioneProdotto(listaProdottiPrenotati[index].prodottoPrenotato);
+                          userViewModel.annullaPrenotazioneProdotto(userViewModel.listaProdottiPrenotati[index]['prodottoPrenotato']);
                         },
                       );
                     },
                   )
                       : Center(
-                    child: Container(
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: myGold, width: 3),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        "NON CI SONO PRODOTTI PRENOTATI",
-                        style: TextStyle(fontSize: 20, color: myWhite),
-                        textAlign: TextAlign.center,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: myGold, width: 3),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          "NON CI SONO PRODOTTI PRENOTATI",
+                          style: TextStyle(fontSize: 20, color: myWhite),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
                   ),
@@ -176,19 +179,37 @@ class ProdPrenItem extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Vuoi annullare la prenotazione?"),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        title: Text("Vuoi annullare la prenotazione?", textAlign: TextAlign.center,),
+        backgroundColor: myWhite,
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("No"),
+          ElevatedButton(
+          onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: myBordeaux,
+            ),
+            child: const Text(
+              "No",
+              style: TextStyle(color: myWhite),
+            ),
           ),
-          TextButton(
+
+          ElevatedButton(
             onPressed: () {
               onDelete();
               Navigator.pop(context);
             },
-            child: Text("Sì"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: myBordeaux,
+            ),
+            child: const Text(
+              "Sì",
+              style: TextStyle(color: myWhite),
+            ),
           ),
+
         ],
       ),
     );
