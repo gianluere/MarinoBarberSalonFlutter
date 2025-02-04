@@ -170,48 +170,32 @@ class _RiepilogoState extends State<Riepilogo> {
         ),
       )
           : showDialogSuccess
-          ? _DialogSuccess(onDismiss: () {
+          ? DialogSuccess(
+          onDismiss: () {
             Navigator.of(context).pop();
             Navigator.of(context).pop();
             Navigator.of(context).pop();
-          }
+          },
+          testo: "Prenotazione effettuata\ncon successo",
           )
-          : _DialogError(onDismiss: () {
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-      }),
+          : DialogError(
+              onDismiss: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+              testo: "Errore, lo slot è già\nstato occupato",
+            ),
     );
   }
 
-  void _handleBooking() async {
-    try {
-      // Simulate API Call
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Check if appointment is valid
-      if (true /* Replace with actual condition */) {
-        setState(() {
-          showDialogSuccess = true;
-        });
-        // Handle notification scheduling here
-      } else {
-        setState(() {
-          showDialogError = true;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        showDialogError = true;
-      });
-    }
-  }
 }
 
-class _DialogSuccess extends StatelessWidget {
+class DialogSuccess extends StatelessWidget {
   final Function onDismiss;
+  final String testo;
 
-  const _DialogSuccess({required this.onDismiss, Key? key}) : super(key: key);
+  const DialogSuccess({required this.onDismiss, required this.testo, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -228,8 +212,8 @@ class _DialogSuccess extends StatelessWidget {
           children: [
             const Icon(Icons.check_circle, size: 80, color: Colors.green),
             const SizedBox(height: 16),
-            const Text(
-              "Prenotazione effettuata\ncon successo",
+            Text(
+              testo,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20),
             ),
@@ -241,7 +225,7 @@ class _DialogSuccess extends StatelessWidget {
               ),
               child: const Text(
                 "OK",
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: myWhite),
               ),
             ),
           ],
@@ -251,10 +235,11 @@ class _DialogSuccess extends StatelessWidget {
   }
 }
 
-class _DialogError extends StatelessWidget {
+class DialogError extends StatelessWidget {
   final Function onDismiss;
+  final String testo;
 
-  const _DialogError({required this.onDismiss, Key? key}) : super(key: key);
+  const DialogError({required this.onDismiss, required this.testo, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -271,8 +256,8 @@ class _DialogError extends StatelessWidget {
           children: [
             const Icon(Icons.error, size: 80, color: Colors.red),
             const SizedBox(height: 16),
-            const Text(
-              "Errore, lo slot è già\nstato occupato",
+            Text(
+              testo,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20),
             ),
@@ -284,7 +269,7 @@ class _DialogError extends StatelessWidget {
               ),
               child: const Text(
                 "OK",
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: myWhite),
               ),
             ),
           ],

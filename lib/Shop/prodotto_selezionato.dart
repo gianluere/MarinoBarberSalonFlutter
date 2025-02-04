@@ -3,7 +3,7 @@ import 'package:marino_barber_salon_flutter/Shop/prodotto.dart';
 import 'package:marino_barber_salon_flutter/app_bar.dart';
 import 'package:marino_barber_salon_flutter/my_colors.dart';
 import 'package:provider/provider.dart';
-
+import 'package:marino_barber_salon_flutter/Home/riepilogo.dart';
 import 'lista_prodotti_view_model.dart';
 
 class ProdottoShop extends StatefulWidget {
@@ -29,96 +29,121 @@ class _ProdottoShopState extends State<ProdottoShop> {
     final listaProdottiViewModel = Provider.of<ListaProdottiViewModel>(context);
     
     return Scaffold(
-      
       appBar: MyAppBar('SHOP', true),
       backgroundColor: myGrey,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(prodotto.nome, style: TextStyle(fontSize: 24, color: myWhite)),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal:25),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: 250,
-                    maxWidth: 300// Imposta l'altezza massima
-                  ),
-                  child: Container(
-                    //width: double.infinity,
-                    //height: 200,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: myGold, width: 2),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        height: 250,
-                        width: 300,
-                        prodotto.immagine,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(child: CircularProgressIndicator(color: myGold));
-                        },
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.asset('assets/placeholder.png', fit: BoxFit.cover);
-                        },
+      body: listaProdottiViewModel.isLoading
+        ? Center(child: CircularProgressIndicator(color: myGold,),)
+        : !showDialogError && !showDialogSuccess
+          ? Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(prodotto.nome, style: TextStyle(fontSize: 24, color: myWhite)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal:25),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: 250,
+                        maxWidth: 300
+                      ),
+                      child: Container(
+                        //width: double.infinity,
+                        //height: 200,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: myGold, width: 2),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            height: 250,
+                            width: 300,
+                            prodotto.immagine,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (BuildContext context, Widget child,
+                                ImageChunkEvent? loadingProgress) {
+                              if (loadingProgress == null) {
+                                return child;
+                              }
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.asset('assets/placeholder.png', fit: BoxFit.cover);
+                            },
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(prodotto.descrizione, style: TextStyle(fontSize: 18, color: myWhite), maxLines: 3, overflow: TextOverflow.ellipsis,),
-            const SizedBox(height: 10),
-            prodotto.quantita > 0
-                ? Row(
-              children: [
-                Text("Quantità: $counter", style: TextStyle(fontSize: 24, color: myWhite)),
-                const SizedBox(width: 15),
-                _buildCounterButton(Icons.remove, () {
-                  if (counter > 1) setState(() => counter--);
-                }),
-                _buildCounterButton(Icons.add, () {
-                  if (counter < prodotto.quantita) setState(() => counter++);
-                }),
-              ],
-            )
-                : Text("Attualmente non disponibile", style: TextStyle(fontSize: 24, color: myWhite)),
-            const Spacer(),
+                const SizedBox(height: 10),
+                Text(prodotto.descrizione, style: TextStyle(fontSize: 18, color: myWhite), maxLines: 3, overflow: TextOverflow.ellipsis,),
+                const SizedBox(height: 10),
+                prodotto.quantita > 0
+                    ? Row(
+                  children: [
+                    Text("Quantità: $counter", style: TextStyle(fontSize: 24, color: myWhite)),
+                    const SizedBox(width: 15),
+                    _buildCounterButton(Icons.remove, () {
+                      if (counter > 1) setState(() => counter--);
+                    }),
+                    _buildCounterButton(Icons.add, () {
+                      if (counter < prodotto.quantita) setState(() => counter++);
+                    }),
+                  ],
+                )
+                    : Text("Attualmente non disponibile", style: TextStyle(fontSize: 24, color: myWhite)),
+                const Spacer(),
 
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: prodotto.quantita > 0
-                    ? () {
-                  listaProdottiViewModel.prenotaProdotto(
-                    prodotto,
-                    counter,
-                    () => setState(() => showDialogSuccess = true),
-                    () => setState(() => showDialogError = true),
-                  );
-                }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: myBordeaux,
-                  disabledBackgroundColor: Colors.grey,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: prodotto.quantita > 0
+                        ? () {
+                      listaProdottiViewModel.prenotaProdotto(
+                        prodotto,
+                        counter,
+                        () => setState(() => showDialogSuccess = true),
+                        () => setState(() => showDialogError = true),
+                      );
+                    }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: myBordeaux,
+                      disabledBackgroundColor: Colors.grey,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Text("PRENOTA", style: TextStyle(fontSize: 25, color: myGold)),
+                    ),
+                  ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Text("PRENOTA", style: TextStyle(fontSize: 25, color: myGold)),
-                ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          )
+          : showDialogSuccess
+            ? DialogSuccess(
+              onDismiss: (){
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              testo: "Prodotto prenotato\ncon successo",
+            )
+          : DialogError(
+            onDismiss: (){
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+            testo: "Errore, verificare la\ndisponibilità del prodotto"
+          )
     );
   }
 

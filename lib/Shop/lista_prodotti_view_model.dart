@@ -138,6 +138,87 @@ class ListaProdottiViewModel extends ChangeNotifier {
     }
   }
 
+
+  Future<void> prenProdotto({
+    required String nomeProdotto,
+    required int quantita,
+    required Function() onSuccess,
+    required Function() onFailed,
+  }) async {
+
+    try {
+
+      _isLoading = true;
+      notifyListeners();
+
+      // Trova il prodotto in Firestore
+      QuerySnapshot prodSnapshot = await _db.collection("prodotti")
+          .where("nome", isEqualTo: nomeProdotto)
+          .limit(1)
+          .get();
+
+      if (prodSnapshot.docs.isEmpty) {
+        print("Prodotto non trovato");
+        _isLoading = false;
+        notifyListeners();
+        onFailed();
+        return;
+      }
+
+      // Referenze ai documenti
+      DocumentReference prodRef = _db.collection("prodotti").doc(prodSnapshot.docs.first.id);
+      DocumentReference userRef = _db.collection("utenti").doc(_auth.currentUser?.email);
+
+      String data = DateFormat("dd/MM/yyyy", "it_IT").format(DateTime.now());
+
+      // Dati per la prenotazione
+      Map<String, dynamic> prenotazioneProd = {
+        "prodotto": prodRef,
+        "utente": userRef,
+        "quantita": quantita,
+        "stato": "attesa",
+        "data": data,
+      };
+
+      // Esegui la transazione
+      await _db.runTransaction((transaction) async {
+        DocumentSnapshot userSnapshot = await transaction.get(userRef);
+        DocumentSnapshot prodottoSnapshot = await transaction.get(prodRef);
+
+        if (prodottoSnapshot.exists) {
+          int quantitaAttuale = (prodottoSnapshot.data() as Map<String, dynamic>)["quantita"] ?? 0;
+          if (quantitaAttuale >= quantita) {
+            transaction.update(prodRef, {"quantita": quantitaAttuale - quantita});
+            print("Quantità aggiornata: ${quantitaAttuale - quantita}");
+          } else {
+            print("Quantità insufficiente!");
+            _isLoading = false;
+            notifyListeners();
+            onFailed();
+            return;
+          }
+        }
+
+        if (userSnapshot.exists) {
+          DocumentReference nuovoDocumentoRef = _db.collection("prodottiPrenotati").doc();
+          transaction.set(nuovoDocumentoRef, prenotazioneProd);
+          print("Prenotazione inserita!");
+        }
+
+        _isLoading = false;
+        notifyListeners();
+        onSuccess();
+      });
+    } catch (e) {
+      print("Errore: $e");
+      _isLoading = false;
+      notifyListeners();
+      onFailed();
+    }
+  }
+
+
+
   // Ottieni URL firmato da Supabase
   String getSignedUrl(String filePath, {int expiresInSeconds = 3600}) {
     final storage = _supabaseClient.storage;

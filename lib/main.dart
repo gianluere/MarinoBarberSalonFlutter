@@ -6,6 +6,7 @@ import 'package:marino_barber_salon_flutter/Home/lista_servizi_view_model.dart';
 import 'package:marino_barber_salon_flutter/Home/notifiche_view_model.dart';
 import 'package:marino_barber_salon_flutter/Shop/lista_prodotti_view_model.dart';
 import 'package:marino_barber_salon_flutter/main_wrapper.dart';
+import 'package:marino_barber_salon_flutter/sign_up.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -56,7 +57,8 @@ class MyApp extends StatelessWidget {
         initialRoute: '/login',
         routes: {
           '/login': (context) => LoginPage(),
-          '/main' : (context) => MainWrapper()
+          '/sign_up': (context) => SignUpScreen(),
+          '/main' : (context) => MainWrapper(),
         }
       ),
     );

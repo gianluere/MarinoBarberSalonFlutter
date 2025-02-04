@@ -89,8 +89,10 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Funzione di registrazione (opzionale)
-  Future<void> register(String email, String password) async {
+  // Funzione di registrazione
+  Future<void> register(String email, String password, String nome, String cognome, String eta, String telefono) async {
+    _isLoading = true;
+    notifyListeners();
     try {
       _errorMessage = null;
       final userCredential = await _auth.createUserWithEmailAndPassword(
@@ -98,9 +100,83 @@ class UserViewModel extends ChangeNotifier {
         password: password,
       );
       _currentUser = userCredential.user;
+
+
+
+      caricaDati();
+      _isLoading = false;
       notifyListeners();
     } on FirebaseAuthException catch (e) {
+      _isLoading = false;
       _errorMessage = e.message;
+      notifyListeners();
+    }
+  }
+
+
+
+
+  Future<void> signup({
+    required String email,
+    required String password,
+    required String nome,
+    required String cognome,
+    int eta = 0,
+    required String telefono,
+  }) async {
+    _errorMessage=null;
+    notifyListeners();
+
+    if (email.isEmpty || password.isEmpty) {
+      _errorMessage = "Email e password non possono essere vuoti";
+      notifyListeners();
+      return;
+    }
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // Creazione dell'utente con Firebase Authentication
+      UserCredential userCredential =
+      await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      _currentUser = userCredential.user;
+
+      // Ottenere l'email dell'utente appena creato
+      String? userEmail = _currentUser?.email;
+
+      if (userEmail != null) {
+        // Salvataggio dati utente su Firestore
+        await _db.collection("utenti").doc(userEmail).set({
+          "nome": nome,
+          "cognome": cognome,
+          "email": email,
+          "eta": eta,
+          "telefono": telefono,
+          "appuntamenti" : <DocumentReference>[]
+        });
+
+
+        await caricaDati();
+        _isLoading = false;
+        notifyListeners();
+
+      }
+    } on FirebaseAuthException catch (e) {
+      debugPrint("Errore Firebase: ${e.code}");
+      Map<String, String> firebaseErrorMessages = {
+        "email-already-in-use": "L'email è già in uso.",
+        "invalid-email": "L'email inserita non è valida.",
+        "weak-password": "La password è troppo debole.",
+        "operation-not-allowed": "Registrazione tramite email e password non consentita.",
+      };
+
+      _errorMessage = firebaseErrorMessages[e.code] ?? "Errore sconosciuto.";
+      _isLoading = false;
       notifyListeners();
     }
   }

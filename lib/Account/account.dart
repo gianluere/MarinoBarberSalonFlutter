@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marino_barber_salon_flutter/Home/notifiche_view_model.dart';
 import 'package:marino_barber_salon_flutter/Navigations/home_navigations.dart';
@@ -89,6 +90,7 @@ class AccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final notificheViewModel = Provider.of<NotificheViewModel>(context);
+    final userViewModel = Provider.of<UserViewModel>(context);
 
     return Scaffold(
       appBar: MyAppBar('ACCOUNT', false),
@@ -130,6 +132,47 @@ class AccountScreen extends StatelessWidget {
             color: myGold,
             height: 2.0,
           ),
+          Spacer(),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20.0),
+            child: ElevatedButton(
+              onPressed: () async{
+                await userViewModel.logout();
+
+
+                while (homeNavigatorKey.currentState?.canPop() ?? false) {
+                  homeNavigatorKey.currentState?.pop();
+                }
+                while (accountNavigatorKey.currentState?.canPop() ?? false) {
+                  accountNavigatorKey.currentState?.pop();
+                }
+                while (shopNavigatorKey.currentState?.canPop() ?? false) {
+                  shopNavigatorKey.currentState?.pop();
+                }
+
+                mainNavigatorKey.currentState?.pushNamedAndRemoveUntil(
+                  '/login', (route) => false, // Rimuove tutte le route precedenti
+                );
+
+
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: myBordeaux,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 14.0, horizontal: 64)
+              ),
+              child: const Text(
+                'LOGOUT',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: myGold,
+                ),
+              ),
+            ),
+          )
+
         ],
       ),
     );
