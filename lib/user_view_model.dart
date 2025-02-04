@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:marino_barber_salon_flutter/Account/prodotto_prenotato.dart';
+import 'package:marino_barber_salon_flutter/noti_service.dart';
 
 import 'Home/appuntamento.dart';
 import 'Home/user.dart';
@@ -259,11 +260,11 @@ class UserViewModel extends ChangeNotifier {
       final descrizione = results.docs[0].get("descrizione");
       final prezzo = results.docs[0].get("prezzo").toDouble();
 
-      print("Problema 1");
+
       final DocumentReference<Map<String, dynamic>> utenteRiferimento =
       _db.collection("utenti").doc(currentUser!.email);
 
-      print("Problema 2");
+
 
       final appuntamento = {
         "cliente": utenteRiferimento,
@@ -279,7 +280,7 @@ class UserViewModel extends ChangeNotifier {
       final occupatiPath = _db.collection("occupati").doc(data);
       final totalePath = appuntamentoPath.collection("totale").doc("count");
 
-      print("Problema 3");
+
 
       await _db.runTransaction((transaction) async {
         final appuntamentoSnapshot = await transaction.get(appuntamentoPath);
@@ -289,7 +290,7 @@ class UserViewModel extends ChangeNotifier {
 
         print("Chiave : $chiave");
 
-        print("Problema 4");
+
 
         // Aggiungi appuntamento
         if (appuntamentoSnapshot.exists) {
@@ -299,7 +300,7 @@ class UserViewModel extends ChangeNotifier {
             appuntamento
           );
         } else {
-          print("aaa");
+
           transaction.set(appuntamentoPath, <String, dynamic>{});
           transaction.set(
             appuntamentoPath.collection("app").doc(chiave),
@@ -317,7 +318,6 @@ class UserViewModel extends ChangeNotifier {
           transaction.set(totalePath, {"count": 1});
         }
 
-        print("Problema 5");
 
         // Gestisci la collezione occupati
         if (occupatiSnapshot.exists) {
@@ -334,8 +334,6 @@ class UserViewModel extends ChangeNotifier {
           transaction.set(occupatiPath, {chiave: "occupato"});
         }
 
-        print("Problema 6");
-
         // Aggiorna il riferimento utente
         transaction.update(
           utenteRiferimento,
@@ -348,6 +346,15 @@ class UserViewModel extends ChangeNotifier {
       });
 
       await caricaDati();
+      final String mess = 'Hai un appuntamento oggi alle $orarioInizio per il servizio $servizioNome.';
+      NotiService().scheduleNotification(
+          id: 1,
+          title: 'Promemoria appuntamento',
+          body: mess,
+          hour: 23,
+          minute: 14
+      );
+
       _isLoading = false;
       notifyListeners();
       onSuccess();
