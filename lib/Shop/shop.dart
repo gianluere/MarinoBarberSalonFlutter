@@ -79,6 +79,7 @@ class GridItem extends StatelessWidget {
     return GestureDetector(
       onTap: () => {Navigator.of(context).pushNamed('/prodotto_shop', arguments: prodotto)},
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
