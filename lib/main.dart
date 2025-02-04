@@ -6,6 +6,7 @@ import 'package:marino_barber_salon_flutter/Home/lista_servizi_view_model.dart';
 import 'package:marino_barber_salon_flutter/Home/notifiche_view_model.dart';
 import 'package:marino_barber_salon_flutter/Shop/lista_prodotti_view_model.dart';
 import 'package:marino_barber_salon_flutter/main_wrapper.dart';
+import 'package:marino_barber_salon_flutter/noti_service.dart';
 import 'package:marino_barber_salon_flutter/sign_up.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -22,6 +23,8 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform, // Inizializza Firebase con le opzioni corrette per la piattaforma.
   );
+
+  NotiService().initNotification();
 
   await initializeDateFormatting('it_IT', null);
 
