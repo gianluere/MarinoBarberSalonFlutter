@@ -34,7 +34,7 @@ class ProdottiPrenotati extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     "Da ritirare in negozio:",
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: myWhite),
                   ),
                 ),
                 Expanded(
@@ -54,12 +54,12 @@ class ProdottiPrenotati extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.amber, width: 3),
+                        border: Border.all(color: myGold, width: 3),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         "NON CI SONO PRODOTTI PRENOTATI",
-                        style: TextStyle(fontSize: 20, color: Colors.white),
+                        style: TextStyle(fontSize: 20, color: myWhite),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -73,57 +73,7 @@ class ProdottiPrenotati extends StatelessWidget {
 
       ),
     );
-      /*
-      Consumer<UserViewModel>(
-      builder: (context, userViewModel, child) {
-        userViewModel.caricaProdottiPrenotati(); // Carica i prodotti
 
-        final listaProdottiPrenotati = userViewModel.listaProdottiPrenotati;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "Da ritirare in negozio:",
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-            ),
-            Expanded(
-              child: listaProdottiPrenotati.isNotEmpty
-                  ? ListView.builder(
-                itemCount: listaProdottiPrenotati.length,
-                itemBuilder: (context, index) {
-                  return ProdPrenItem(
-                    item: listaProdottiPrenotati[index],
-                    onDelete: () {
-                      //userViewModel.annullaPrenotazioneProdotto(listaProdottiPrenotati[index].prodottoPrenotato);
-                    },
-                  );
-                },
-              )
-                  : Center(
-                child: Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.amber, width: 3),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    "NON CI SONO PRODOTTI PRENOTATI",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-
-       */
   }
 
 
@@ -204,10 +154,16 @@ class ProdPrenItem extends StatelessWidget {
               SizedBox(width: 16),
 
               // Bottone elimina
-              IconButton(
-                icon: Icon(Icons.delete, color: myBordeaux, size: 30),
-                onPressed: () => _showDeleteDialog(context),
-              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: myBordeaux,
+                  borderRadius: BorderRadius.circular(10), // Angoli arrotondati
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.delete, color: Colors.black, size: 30),
+                  onPressed: () => _showDeleteDialog(context),
+                ),
+              )
             ],
           ),
         ),
