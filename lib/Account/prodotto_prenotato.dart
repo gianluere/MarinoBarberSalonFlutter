@@ -16,5 +16,15 @@ class ProdottoPrenotato{
     required this.utente
   });
 
+  factory ProdottoPrenotato.fromMap(Map<String, dynamic> map) {
+    return ProdottoPrenotato(
+        prodotto: map['prodotto'] ?? [],
+        quantita: (map['quantita'] as num?)?.toInt() ?? 0,
+        stato: map['stato'] ?? '',
+        utente: map['utente'] ?? '',
+        data: map['data'] ?? ''
+    );
+  }
+
 
 }

@@ -2,9 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:marino_barber_salon_flutter/Account/prodotto_prenotato.dart';
 
 import 'Home/appuntamento.dart';
 import 'Home/user.dart';
+import 'Shop/prodotto.dart';
 
 class UserViewModel extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -16,6 +18,7 @@ class UserViewModel extends ChangeNotifier {
   bool _isLoading = true;
   bool _isLoadingPrenotazioni = true;
   List<Appuntamento>? _listaAppuntamenti;
+  List<Map<String, dynamic>> _listaProdottiPrenotati = [];
 
   User? get currentUser => _currentUser;
   String? get errorMessage => _errorMessage;
@@ -23,6 +26,7 @@ class UserViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isLoadingPrenotazioni => _isLoadingPrenotazioni;
   List<Appuntamento>? get listaAppuntamenti => _listaAppuntamenti;
+  List<Map<String, dynamic>> get listaProdottiPrenotati => _listaProdottiPrenotati;
 
   UserViewModel() {
 
@@ -55,6 +59,8 @@ class UserViewModel extends ChangeNotifier {
 
     print("Nome: ${_dati?.nome}");
     print("Cognome: ${_dati?.cognome}");
+
+    await caricaProdottiPrenotati();
 
     _isLoading = false;
     notifyListeners();
@@ -532,6 +538,76 @@ class UserViewModel extends ChangeNotifier {
       notifyListeners();
       errore();
       debugPrint("Errore durante l'annullamento della prenotazione: $e");
+    }
+  }
+
+
+
+  Future<void> caricaProdottiPrenotati() async {
+
+    _isLoading = true;
+    notifyListeners();
+
+    List<Map<String, dynamic>> listaProdottiAssociati = [];
+
+    try {
+      // Ottieni l'email dell'utente loggato
+      String? email = FirebaseAuth.instance.currentUser?.email;
+      if (email == null) {
+        _isLoading = false;
+        notifyListeners();
+
+        return;
+      }
+
+      DocumentReference userReference = _db.collection("utenti").doc(email);
+
+      // Recupera i prodotti prenotati dallo stato "attesa"
+      QuerySnapshot prodottiPrenotatiSnapshot = await _db.collection("prodottiPrenotati")
+          .where("utente", isEqualTo: userReference)
+          .where("stato", isEqualTo: "attesa")
+          .get();
+
+      List<Future<void>> tasks = [];
+
+      for (var doc in prodottiPrenotatiSnapshot.docs) {
+        // Converti il documento in un oggetto ProdottoPrenotato
+        ProdottoPrenotato prodottoPrenotato = ProdottoPrenotato.fromMap(doc.data() as Map<String, dynamic>);
+        print("Prenotato: ${prodottoPrenotato.quantita}");
+
+        DocumentReference? prodottoRef = prodottoPrenotato.prodotto;
+        if (prodottoRef != null) {
+          // Carica il prodotto associato
+          Future<void> task = prodottoRef.get().then((prodottoDoc) {
+            if (prodottoDoc.exists) {
+              Prodotto prodotto = Prodotto.fromFirestore(prodottoDoc);
+              print("Prodotto associato: ${prodotto.nome}");
+
+              listaProdottiAssociati.add({
+                "prodottoPrenotato": prodottoPrenotato,
+                "prodotto": prodotto,
+              });
+            }
+          });
+
+          tasks.add(task);
+        }
+      }
+
+      // Attendi il completamento di tutti i task
+      await Future.wait(tasks);
+
+      // Ordina i prodotti per nome
+      listaProdottiAssociati.sort(
+              (a, b) => a["prodotto"].nome.compareTo(b["prodotto"].nome));
+
+      _listaProdottiPrenotati = listaProdottiAssociati;
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      print("Errore nel caricamento dei prodotti prenotati: $e");
     }
   }
 

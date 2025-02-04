@@ -122,7 +122,7 @@ class AccountScreen extends StatelessWidget {
             color: myGold,
             height: 2.0,
           ),
-          _buildRow("Acquisti in app", ()=>{}, notificheProdotti),
+          _buildRow("Acquisti in app", (){Navigator.of(context).pushNamed('/prodotti_prenotati');}, notificheProdotti),
           Container(
             color: myGold,
             height: 2.0,
