@@ -3,7 +3,7 @@ import 'package:marino_barber_salon_flutter/app_bar.dart';
 import 'package:marino_barber_salon_flutter/my_colors.dart';
 import 'package:provider/provider.dart';
 
-import '../user_view_model.dart'; // Importa il tuo ViewModel corretto
+import '../user_view_model.dart';
 
 class DatiPersonali extends StatefulWidget {
   const DatiPersonali({super.key});
@@ -81,20 +81,7 @@ class _DatiPersonaliState extends State<DatiPersonali> {
                         setState(() {
                           readOnly = true;
                         });
-                        /*
-                      userViewModel.updateDati(
-                        nomeController.text,
-                        cognomeController.text,
-                        int.tryParse(etaController.text) ?? 0,
-                        telefonoController.text,
-                            () {
-                          setState(() {
-                            readOnly = true;
-                          });
-                        },
-                      );
 
-                       */
                       }
                     },
                   ),

@@ -19,7 +19,7 @@ class ListaRecensioniViewModel extends ChangeNotifier {
     caricaListaRecensioni();
   }
 
-  Future<void> caricaListaRecensioni() async {  // Cambiato da void a Future<void>
+  Future<void> caricaListaRecensioni() async {
     try {
       _isLoading = true;
       notifyListeners();
@@ -49,7 +49,7 @@ class ListaRecensioniViewModel extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
       onCompleted();
-      caricaListaRecensioni(); // Aggiorna la lista dopo l'inserimento
+      caricaListaRecensioni();
     }).catchError((error) {
       _isLoading = false;
       notifyListeners();

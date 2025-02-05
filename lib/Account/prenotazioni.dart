@@ -71,16 +71,8 @@ class CardPrenotazione extends StatelessWidget {
     //print('Ora APP: $oraApp');
 
 
-    bool attivo = oggi.isBefore(giornoApp); // || (oggi.year == giornoApp.year && oggi.month == giornoApp.month && oggi.day == giornoApp.day && oggi.hour <= oraApp.hour && oggi.minute <= oraApp.minute);
-/*
-    bool attivo;
+    bool attivo = oggi.isBefore(giornoApp);
 
-
-    if(oggi.isBefore(giornoApp)){
-      attivo = true;
-    }else if(oggi.)
-
- */
 
     return Card(
       color: attivo ? myYellow : Colors.grey,

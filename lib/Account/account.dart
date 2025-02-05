@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marino_barber_salon_flutter/Home/notifiche_view_model.dart';
 import 'package:marino_barber_salon_flutter/Navigations/home_navigations.dart';
@@ -10,7 +9,6 @@ import 'package:marino_barber_salon_flutter/user_view_model.dart';
 import 'package:provider/provider.dart';
 
 import '../Navigations/account_navigations.dart';
-import '../login.dart';
 
 
 class Account extends StatefulWidget {
