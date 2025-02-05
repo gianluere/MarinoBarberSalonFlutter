@@ -24,7 +24,7 @@ void main() async{
     options: DefaultFirebaseOptions.currentPlatform, // Inizializza Firebase con le opzioni corrette per la piattaforma.
   );
 
-  NotiService().initNotification();
+  await NotiService().initNotification();
 
   await initializeDateFormatting('it_IT', null);
 

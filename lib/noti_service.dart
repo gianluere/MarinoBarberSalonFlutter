@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -14,6 +18,8 @@ class NotiService{
   //init
   Future<void> initNotification() async{
     if(_isInitialized) return;
+
+    await requestNotificationPermissions();
 
     //init timezone
     tz.initializeTimeZones();
@@ -47,11 +53,13 @@ class NotiService{
   NotificationDetails notificationDetails(){
     return const NotificationDetails(
       android: AndroidNotificationDetails(
-        'daily_channel_id',
-        'Daily Notifications',
-        channelDescription: 'Daily Notifications Channel',
+        'scheduled_notifications', // ID del canale (deve essere univoco e lo stesso usato per tutte le notifiche)
+        'Scheduled Notifications', // Nome del canale
+        channelDescription: 'Channel for scheduled notifications',
         importance: Importance.max,
-        priority: Priority.high
+        priority: Priority.high,
+        playSound: true, // Assicura che il suono sia abilitato
+        enableVibration: true, // Attiva la vibrazione
       ),
       iOS: DarwinNotificationDetails()
     );
@@ -71,10 +79,16 @@ class NotiService{
     int id = 1,
     required String title,
     required String body,
-    required int hour,
-    required int minute
+    required String data,
   }) async {
 
+
+    PermissionStatus alarmStatus = await Permission.scheduleExactAlarm.status;
+    PermissionStatus notificationStatus = await Permission.notification.status;
+    if (!alarmStatus.isGranted || !notificationStatus.isGranted) {
+      await requestNotificationPermissions();
+      if (!alarmStatus.isGranted || !notificationStatus.isGranted) return;
+    }
     //dataora locale attuale
     final now = tz.TZDateTime.now(tz.local);
 
@@ -82,27 +96,34 @@ class NotiService{
     print('tz noti: $now');
     print('TZ LOCAL: ${tz.local.toString()}, ${now.day}');
 
+    // Parsing della data (dd-MM-yyyy)
+    DateTime dataFormattata = DateFormat('dd-MM-yyyy').parse(data);
+
+
     var scheduledDate = tz.TZDateTime(
       tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute
+      dataFormattata.year,
+      dataFormattata.month,
+      dataFormattata.day,
+      8,
+      0
     );
+
 
     await notificationsPlugin.zonedSchedule(
         id,
         title,
         body,
         scheduledDate,
-        await notificationDetails(),
+        notificationDetails(),
 
         //impostazione per ios: usa time specified
         uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
 
         //impostazione android: permette notifiche in low-power mode
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+
+        //matchDateTimeComponents: DateTimeComponents.time
     );
 
     print("Schedulata per $scheduledDate");
@@ -113,6 +134,35 @@ class NotiService{
   Future<void> cancellAllNotifications() async{
     await notificationsPlugin.cancelAll();
   }
+
+  Future<void> checkPendingNotifications() async {
+    final pending = await notificationsPlugin.pendingNotificationRequests();
+    print("Notifiche pianificate: ${pending.length}");
+    for (var noti in pending) {
+      print("ID: ${noti.id}, Titolo: ${noti.title}, Corpo: ${noti.body}");
+    }
+  }
+
+  Future<void> requestNotificationPermissions() async {
+    //Controlla se i permessi di notifiche sono concessi
+    PermissionStatus notificationStatus = await Permission.notification.status;
+    if (!notificationStatus.isGranted) {
+      notificationStatus = await Permission.notification.request();
+    }
+
+    //Controlla se il permesso SCHEDULE_EXACT_ALARM è necessario (solo Android 14+)
+    PermissionStatus alarmStatus = await Permission.scheduleExactAlarm.status;
+    if (!alarmStatus.isGranted) {
+      alarmStatus = await Permission.scheduleExactAlarm.request();
+    }
+
+    if (notificationStatus.isGranted && alarmStatus.isGranted) {
+      print("Tutti i permessi concessi!");
+    } else {
+      print("Permessi negati. L'utente deve abilitarli manualmente.");
+    }
+  }
+
 
 
 }

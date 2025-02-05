@@ -347,13 +347,25 @@ class UserViewModel extends ChangeNotifier {
 
       await caricaDati();
       final String mess = 'Hai un appuntamento oggi alle $orarioInizio per il servizio $servizioNome.';
-      NotiService().scheduleNotification(
-          id: 1,
+
+
+      DateTime dataFormattata = DateFormat('dd-MM-yyyy').parse(data);
+      DateTime oggi = DateTime.now();
+      DateTime oggiFormattato = DateTime(oggi.year, oggi.month, oggi.day);
+
+      if(oggiFormattato.isAtSameMomentAs(dataFormattata)){
+        NotiService noti =  NotiService();
+        await noti.showNotification(title: 'Promemoria appuntamento', body: mess,);
+      }else{
+        NotiService noti =  NotiService();
+        await noti.scheduleNotification(
+          id: 5,
           title: 'Promemoria appuntamento',
           body: mess,
-          hour: 23,
-          minute: 14
-      );
+          data: data,
+        );
+      }
+
 
       _isLoading = false;
       notifyListeners();

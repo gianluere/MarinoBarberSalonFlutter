@@ -117,7 +117,8 @@ class SelezionaTipo extends StatelessWidget {
         ),
 
         ElevatedButton(onPressed: (){NotiService().showNotification(id: 3, title: "Prima notifica", body: "Corpo prima notifica");}, child: Text("Premi")),
-        ElevatedButton(onPressed: (){NotiService().cancellAllNotifications();}, child: Text("Cancella"))
+        ElevatedButton(onPressed: (){NotiService().cancellAllNotifications();}, child: Text("Cancella")),
+        ElevatedButton(onPressed: (){NotiService().checkPendingNotifications();}, child: Text("Stampa"))
 
       ],
     );

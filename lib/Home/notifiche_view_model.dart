@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,18 +12,35 @@ import 'appuntamento.dart';
 class NotificheViewModel extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  StreamSubscription? _prenotazioniSubscription;
+  int _notifichePrenotazioni = 0;
 
-  int notifichePrenotazioni = 0;
+  int get notifichePrenotazioni => _notifichePrenotazioni;
+
 
   NotificheViewModel() {
+
     _startListenerPrenotazioni();
+
+    _auth.authStateChanges().listen((User? user) {
+      if (user != null) {
+       _startListenerPrenotazioni();
+      } else {
+        stopListenerPrenotazioni();
+        _notifichePrenotazioni = 0;
+        notifyListeners();
+      }
+    });
+
+
+
   }
 
   void _startListenerPrenotazioni() {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    _db.collection("utenti").doc(user.email).snapshots().listen((snapshot) async {
+    _prenotazioniSubscription = _db.collection("utenti").doc(user.email).snapshots().listen((snapshot) async {
       if (snapshot.exists) {
         final List<DocumentReference>? appuntamentiList =
         (snapshot.data()?["appuntamenti"] as List<dynamic>?)
@@ -69,7 +88,13 @@ class NotificheViewModel extends ChangeNotifier {
       }
     }
 
-    notifichePrenotazioni = totale;
+    _notifichePrenotazioni = totale;
     notifyListeners();
   }
+
+  void stopListenerPrenotazioni() {
+    _prenotazioniSubscription?.cancel();
+    _prenotazioniSubscription = null;
+  }
+
 }

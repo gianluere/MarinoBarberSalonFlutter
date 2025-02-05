@@ -120,31 +120,49 @@ class ListaGiorniViewModel extends ChangeNotifier{
     final oggiFormatted = normalizedDate(oggi);
     final ultimoFormatted = normalizedDate(oggi.add(Duration(days: giorniTotali)));
 
-
-
     try {
       final giorni = await db.collection('occupati').get();
 
       for (var giorno in giorni.docs) {
         final giornoCorrente = normalizedDate(DateFormat('dd-MM-yyyy').parse(giorno.id));
 
-        //print('Giorno corr: $giornoCorrente');
+        if (giornoCorrente.isAtSameMomentAs(oggiFormatted) ||
+            (giornoCorrente.isAfter(oggiFormatted) && giornoCorrente.isBefore(ultimoFormatted)) ||
+            giornoCorrente.isAtSameMomentAs(ultimoFormatted)) {
 
-        if (
-          giornoCorrente.isAtSameMomentAs(oggiFormatted) ||
-          (giornoCorrente.isAfter(oggiFormatted) && giornoCorrente.isBefore(ultimoFormatted)) ||
-          giornoCorrente.isAtSameMomentAs(ultimoFormatted)
-        ) {
           final slotOrari = <Map<String, String>>[];
           final dati = giorno.data();
+          final orariOrdinati = dati.keys.toList()..sort((a, b) {
+            final orarioInizioA = DateFormat('HH:mm').parse(a.split('-')[0].trim());
+            final orarioInizioB = DateFormat('HH:mm').parse(b.split('-')[0].trim());
+            return orarioInizioA.compareTo(orarioInizioB);
+          });
 
-          for (var key in dati.keys) {
-            final orarioInizio = key.split('-')[0].trim();
-            final orarioFine = key.split('-')[1].trim();
-            slotOrari.add({"inizio": orarioInizio, "fine": orarioFine});
+          for (var key in orariOrdinati) {
+            final orarioInizio = DateFormat('HH:mm').parse(key.split('-')[0].trim());
+            final orarioFine = DateFormat('HH:mm').parse(key.split('-')[1].trim());
+
+            final durataSlot = orarioFine.difference(orarioInizio).inMinutes;
+
+            if (durataSlot >= 60) { // Se la durata è di almeno un'ora, dividiamo in due slot da 30 minuti
+              final primoSlotFine = orarioInizio.add(Duration(minutes: 30));
+              slotOrari.add({
+                "inizio": DateFormat('HH:mm').format(orarioInizio),
+                "fine": DateFormat('HH:mm').format(primoSlotFine),
+              });
+              slotOrari.add({
+                "inizio": DateFormat('HH:mm').format(primoSlotFine),
+                "fine": DateFormat('HH:mm').format(orarioFine),
+              });
+            } else {
+              // Aggiungi lo slot originale
+              slotOrari.add({
+                "inizio": DateFormat('HH:mm').format(orarioInizio),
+                "fine": DateFormat('HH:mm').format(orarioFine),
+              });
+            }
           }
           listaOccupati.add({giornoCorrente: slotOrari});
-          //print("Rimosso");
         }
       }
     } catch (e) {
@@ -153,6 +171,7 @@ class ListaGiorniViewModel extends ChangeNotifier{
 
     return listaOccupati;
   }
+
 
   // Aggiorna la lista degli orari occupati
   List<Map<DateTime, List<Map<String, String>>>> _aggiornaListaOccupati(
