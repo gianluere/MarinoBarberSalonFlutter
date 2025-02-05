@@ -18,10 +18,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async{
 
-  WidgetsFlutterBinding.ensureInitialized(); // Assicura che i binding di Flutter siano inizializzati prima di eseguire codice asincrono.
+  WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // Inizializza Firebase con le opzioni corrette per la piattaforma.
+    options: DefaultFirebaseOptions.currentPlatform,
   );
 
   await NotiService().initNotification();

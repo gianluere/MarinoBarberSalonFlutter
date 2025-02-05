@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:marino_barber_salon_flutter/app_bar.dart';
-import 'package:marino_barber_salon_flutter/noti_service.dart';
 import 'package:provider/provider.dart';
 import '../user_view_model.dart';
 import 'package:marino_barber_salon_flutter/my_colors.dart';
@@ -42,7 +41,6 @@ class SelezionaTipo extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Box per la selezione della barba
         GestureDetector(
           onTap: () => {Navigator.of(context).pushNamed('/seleziona_servizio', arguments: 'barba')},
           child: Stack(
@@ -55,7 +53,7 @@ class SelezionaTipo extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: myGold, width: 3),
                   image: const DecorationImage(
-                    image: AssetImage('assets/barba.jpeg'), // Aggiorna il percorso dell'immagine
+                    image: AssetImage('assets/barba.jpeg'),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
                       Colors.grey,
@@ -71,7 +69,6 @@ class SelezionaTipo extends StatelessWidget {
                   style: TextStyle(
                     color: myWhite,
                     fontSize: 40,
-                    //fontFamily: 'MyFont', // Aggiorna il tuo font personalizzato
                   ),
                 ),
               ),
@@ -108,17 +105,12 @@ class SelezionaTipo extends StatelessWidget {
                   style: TextStyle(
                     color: myWhite,
                     fontSize: 40,
-                    //fontFamily: 'MyFont', // Aggiorna il tuo font personalizzato
                   ),
                 ),
               ),
             ],
           ),
         ),
-
-        ElevatedButton(onPressed: (){NotiService().showNotification(id: 3, title: "Prima notifica", body: "Corpo prima notifica");}, child: Text("Premi")),
-        ElevatedButton(onPressed: (){NotiService().cancellAllNotifications();}, child: Text("Cancella")),
-        ElevatedButton(onPressed: (){NotiService().checkPendingNotifications();}, child: Text("Stampa"))
 
       ],
     );

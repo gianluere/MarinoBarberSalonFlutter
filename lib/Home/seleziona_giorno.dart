@@ -18,7 +18,6 @@ class SelezionaGiorno extends StatefulWidget {
 class _SelezionaGiornoState extends State<SelezionaGiorno> {
   int indexGiornoSelezionato = 0;
   int indexOrarioSelezionato = 0;
-  //bool bottone = false;
   DateTime dataSelezionata = DateTime.now();
   Map<String, String> orarioInizioFine = {};
 
@@ -32,8 +31,6 @@ class _SelezionaGiornoState extends State<SelezionaGiorno> {
       final servizio = ModalRoute.of(context)?.settings.arguments as Servizio;
       final listaGiorniViewModel = Provider.of<ListaGiorniViewModel>(context, listen: false);
 
-      print(DateTime.now().toString());
-      // Chiamata iniziale a initialize
       listaGiorniViewModel.initialize(DateTime.now(), 60, servizio.durata ?? 0);
 
     });
@@ -55,7 +52,6 @@ class _SelezionaGiornoState extends State<SelezionaGiorno> {
       ? Center(child: CircularProgressIndicator(color: myGold,))
       : Column(
         children: [
-          // LazyRow equivalente
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(
@@ -74,7 +70,7 @@ class _SelezionaGiornoState extends State<SelezionaGiorno> {
                         indexGiornoSelezionato = selectedIndex;
                         indexOrarioSelezionato = 0;
                         dataSelezionata = listaGiorni[selectedIndex].keys.first;
-                        //bottone = listaGiorni[selectedIndex][giorno]!.isNotEmpty;
+
                       });
                     },
                   );
@@ -137,7 +133,6 @@ class _SelezionaGiornoState extends State<SelezionaGiorno> {
             ),
           ),
 
-          // Bottone per procedere
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
             child: SizedBox(

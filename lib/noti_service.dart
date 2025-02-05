@@ -83,12 +83,15 @@ class NotiService{
   }) async {
 
 
-    PermissionStatus alarmStatus = await Permission.scheduleExactAlarm.status;
-    PermissionStatus notificationStatus = await Permission.notification.status;
-    if (!alarmStatus.isGranted || !notificationStatus.isGranted) {
-      await requestNotificationPermissions();
-      if (!alarmStatus.isGranted || !notificationStatus.isGranted) return;
+    if(Platform.isAndroid){
+      PermissionStatus alarmStatus = await Permission.scheduleExactAlarm.status;
+      PermissionStatus notificationStatus = await Permission.notification.status;
+      if (!alarmStatus.isGranted || !notificationStatus.isGranted) {
+        await requestNotificationPermissions();
+        if (!alarmStatus.isGranted || !notificationStatus.isGranted) return;
+      }
     }
+
     //dataora locale attuale
     final now = tz.TZDateTime.now(tz.local);
 
@@ -144,6 +147,9 @@ class NotiService{
   }
 
   Future<void> requestNotificationPermissions() async {
+
+    if (!Platform.isAndroid) return;
+
     //Controlla se i permessi di notifiche sono concessi
     PermissionStatus notificationStatus = await Permission.notification.status;
     if (!notificationStatus.isGranted) {

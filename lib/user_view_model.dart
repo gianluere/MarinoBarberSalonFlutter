@@ -58,8 +58,6 @@ class UserViewModel extends ChangeNotifier {
     _dati = await caricaDati();
     sincronizzaPrenotazioni();
 
-    print("Nome: ${_dati?.nome}");
-    print("Cognome: ${_dati?.cognome}");
 
     await caricaProdottiPrenotati();
 
@@ -96,32 +94,6 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Funzione di registrazione
-  Future<void> register(String email, String password, String nome, String cognome, String eta, String telefono) async {
-    _isLoading = true;
-    notifyListeners();
-    try {
-      _errorMessage = null;
-      final userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      _currentUser = userCredential.user;
-
-
-
-      caricaDati();
-      _isLoading = false;
-      notifyListeners();
-    } on FirebaseAuthException catch (e) {
-      _isLoading = false;
-      _errorMessage = e.message;
-      notifyListeners();
-    }
-  }
-
-
-
 
   Future<void> signup({
     required String email,
@@ -153,7 +125,6 @@ class UserViewModel extends ChangeNotifier {
 
       _currentUser = userCredential.user;
 
-      // Ottenere l'email dell'utente appena creato
       String? userEmail = _currentUser?.email;
 
       if (userEmail != null) {
@@ -168,7 +139,7 @@ class UserViewModel extends ChangeNotifier {
         });
 
 
-        await caricaDati();
+        _dati = await caricaDati();
         _isLoading = false;
         notifyListeners();
 
@@ -201,10 +172,10 @@ class UserViewModel extends ChangeNotifier {
         // Crea un'istanza di UserFirebase utilizzando i dati mappati
         var user = UserFirebase(
           nome: data['nome'] ?? '',            // Default a stringa vuota se null
-          cognome: data['cognome'] ?? '',      // Default a stringa vuota se null
-          email: data['email'] ?? '',          // Default a stringa vuota se null
+          cognome: data['cognome'] ?? '',
+          email: data['email'] ?? '',
           eta: data['eta'] ?? 0,               // Default a 0 se null
-          telefono: data['telefono'] ?? '',    // Default a stringa vuota se null
+          telefono: data['telefono'] ?? '',
           appuntamenti: data['appuntamenti'] ?? [], // Default a lista vuota se null
         );
 
@@ -222,12 +193,6 @@ class UserViewModel extends ChangeNotifier {
   }
 
 
-  // Aggiorna lo stato dell'utente
-  void updateUserState(User? user) {
-    _currentUser = user;
-    notifyListeners();
-  }
-
 
   Future<void> aggiungiAppuntamento({
     required String servizio,
@@ -243,9 +208,8 @@ class UserViewModel extends ChangeNotifier {
 
     try {
       final data = dataSel.replaceAll('/', '-');
-      print("Servizio: $servizio");
 
-      // Ottieni il servizio dalla collezione "servizi"
+      //Prendo servizio dalla collezione "servizi"
       final QuerySnapshot<Map<String, dynamic>> results = await _db
           .collection("servizi")
           .where("nome", isEqualTo: servizio)
@@ -281,7 +245,7 @@ class UserViewModel extends ChangeNotifier {
       final totalePath = appuntamentoPath.collection("totale").doc("count");
 
 
-
+      //Sono obbligato a svolgere insieme tutte queste funzioni oppure nessuna di queste
       await _db.runTransaction((transaction) async {
         final appuntamentoSnapshot = await transaction.get(appuntamentoPath);
         final occupatiSnapshot = await transaction.get(occupatiPath);
@@ -292,7 +256,7 @@ class UserViewModel extends ChangeNotifier {
 
 
 
-        // Aggiungi appuntamento
+        //Aggiungo appuntamento
         if (appuntamentoSnapshot.exists) {
           print("Documento appuntamento già esistente");
           transaction.set(
@@ -310,7 +274,7 @@ class UserViewModel extends ChangeNotifier {
 
 
 
-        // Aggiorna la collezione "totale" incrementando il conteggio
+        //Aggiorno la collezione "totale" incrementando il conteggio
         if (totaleSnapshot.exists) {
           final currentCount = totaleSnapshot.get("count") ?? 0;
           transaction.update(totalePath, {"count": currentCount + 1});
@@ -319,7 +283,7 @@ class UserViewModel extends ChangeNotifier {
         }
 
 
-        // Gestisci la collezione occupati
+        //Aggiorno la collezione occupati
         if (occupatiSnapshot.exists) {
           final occupatiMap = occupatiSnapshot.data();
           if (occupatiMap != null && occupatiMap.containsKey(chiave)) {
@@ -345,19 +309,22 @@ class UserViewModel extends ChangeNotifier {
         );
       });
 
-      await caricaDati();
+      _dati = await caricaDati();
       final String mess = 'Hai un appuntamento oggi alle $orarioInizio per il servizio $servizioNome.';
 
 
+      ///Se giorno appuntamento = oggi allora invio notifica istantanea
+      ///altrimenti schedulo la notifica
+      ///
       DateTime dataFormattata = DateFormat('dd-MM-yyyy').parse(data);
       DateTime oggi = DateTime.now();
       DateTime oggiFormattato = DateTime(oggi.year, oggi.month, oggi.day);
 
+      NotiService noti =  NotiService();
+      await noti.initNotification();
       if(oggiFormattato.isAtSameMomentAs(dataFormattata)){
-        NotiService noti =  NotiService();
         await noti.showNotification(title: 'Promemoria appuntamento', body: mess,);
       }else{
-        NotiService noti =  NotiService();
         await noti.scheduleNotification(
           id: 5,
           title: 'Promemoria appuntamento',
@@ -403,7 +370,7 @@ class UserViewModel extends ChangeNotifier {
           .update(daAggiornare)
           .then((_) async {
         _currentUser = _auth.currentUser;
-        await caricaDati();
+        _dati = await caricaDati();
         _isLoading = false;
         notifyListeners();
 
@@ -416,6 +383,8 @@ class UserViewModel extends ChangeNotifier {
   }
 
 
+  ///Funzione di appoggio per altra funzione
+  ///converto i docRef in oggetti Appuntamento
   Future<List<Appuntamento>> _recuperaDocumenti(List<DocumentReference> listaAppuntamenti) async {
     List<Appuntamento> appuntamenti = [];
 
@@ -430,6 +399,7 @@ class UserViewModel extends ChangeNotifier {
     return appuntamenti;
   }
 
+  //Listener per aggiornare automaticamente la lista delle prenotazioni
   Future<void> sincronizzaPrenotazioni() async {
 
     if (_currentUser != null){
@@ -446,7 +416,7 @@ class UserViewModel extends ChangeNotifier {
           notifyListeners();
           List<Appuntamento> listApp = await _recuperaDocumenti(appuntamentiList.cast<DocumentReference>());
 
-          // Rimozione spazi extra nella descrizione
+          // Rimozione spazi extra nella descrizione, problema di visualizzazione caratteri
           for (var app in listApp) {
             app.descrizione = app.descrizione.replaceAll(RegExp(r'\s+'), " ");
           }
@@ -488,6 +458,7 @@ class UserViewModel extends ChangeNotifier {
       ) async {
 
     _isLoading = true;
+    notifyListeners();
     if (_currentUser == null) {
       _isLoading = false;
       notifyListeners();
@@ -497,18 +468,13 @@ class UserViewModel extends ChangeNotifier {
     }
 
     final String emailUtente = _currentUser!.email ?? '';
-    final DocumentReference appuntamentoPath =
-    _db.collection("appuntamenti").doc(appuntamento.data);
-    final DocumentReference occupatiPath =
-    _db.collection("occupati").doc(appuntamento.data);
-    final DocumentReference utenteRiferimento =
-    _db.collection("utenti").doc(emailUtente);
-    final DocumentReference totalePath =
-    appuntamentoPath.collection("totale").doc("count");
+    final DocumentReference appuntamentoPath = _db.collection("appuntamenti").doc(appuntamento.data);
+    final DocumentReference occupatiPath = _db.collection("occupati").doc(appuntamento.data);
+    final DocumentReference utenteRiferimento = _db.collection("utenti").doc(emailUtente);
+    final DocumentReference totalePath = appuntamentoPath.collection("totale").doc("count");
 
     final String chiave = "${appuntamento.orarioInizio}-${appuntamento.orarioFine}";
-    final DocumentReference appuntamentoReference =
-    appuntamentoPath.collection("app").doc(chiave);
+    final DocumentReference appuntamentoReference = appuntamentoPath.collection("app").doc(chiave);
 
     try {
       await _db.runTransaction((transaction) async {
@@ -517,17 +483,17 @@ class UserViewModel extends ChangeNotifier {
         final totaleSnapshot = await transaction.get(totalePath);
         final userSnapshot = await transaction.get(utenteRiferimento);
 
-        // Cancella l'appuntamento se esiste
+        //Cancello l'appuntamento se esiste
         if (appuntamentoSnapshot.exists) {
           transaction.delete(appuntamentoReference);
         }
 
-        // Aggiorna il documento "occupati" rimuovendo la chiave
+        //Aggiorno il documento "occupati" rimuovendo la chiave
         if (occupatiSnapshot.exists) {
           transaction.update(occupatiPath, {chiave: FieldValue.delete()});
         }
 
-        // Rimuove il riferimento appuntamento dall'utente
+        //Rimuovo il riferimento appuntamento dall'utente
         if (userSnapshot.exists) {
           transaction.update(
               utenteRiferimento,
@@ -535,7 +501,7 @@ class UserViewModel extends ChangeNotifier {
           );
         }
 
-        // Aggiorna il conteggio nella collezione "totale"
+        //Aggiorno il conteggio nella collezione "totale"
         if (totaleSnapshot.exists) {
           final int currentCount = (totaleSnapshot.get("count") ?? 0) as int;
           if (currentCount > 0) {
@@ -551,12 +517,12 @@ class UserViewModel extends ChangeNotifier {
 
       _isLoading = false;
       notifyListeners();
-      debugPrint("Prenotazione annullata con successo e totale aggiornato.");
+
     } catch (e) {
       _isLoading = false;
       notifyListeners();
       errore();
-      debugPrint("Errore durante l'annullamento della prenotazione: $e");
+
     }
   }
 
@@ -570,7 +536,7 @@ class UserViewModel extends ChangeNotifier {
     List<Map<String, dynamic>> listaProdottiAssociati = [];
 
     try {
-      // Ottieni l'email dell'utente loggato
+
       String? email = FirebaseAuth.instance.currentUser?.email;
       if (email == null) {
         _isLoading = false;
@@ -581,7 +547,7 @@ class UserViewModel extends ChangeNotifier {
 
       DocumentReference userReference = _db.collection("utenti").doc(email);
 
-      // Recupera i prodotti prenotati dallo stato "attesa"
+      //Recupero i prodotti prenotati dallo stato "attesa"
       QuerySnapshot prodottiPrenotatiSnapshot = await _db.collection("prodottiPrenotati")
           .where("utente", isEqualTo: userReference)
           .where("stato", isEqualTo: "attesa")
@@ -590,16 +556,16 @@ class UserViewModel extends ChangeNotifier {
       List<Future<void>> tasks = [];
 
       for (var doc in prodottiPrenotatiSnapshot.docs) {
-        // Converti il documento in un oggetto ProdottoPrenotato
+        //Convert il docRef in un oggetto ProdottoPrenotato
         ProdottoPrenotato prodottoPrenotato = ProdottoPrenotato.fromMap(doc.data() as Map<String, dynamic>);
-        print("Prenotato: ${prodottoPrenotato.quantita}");
+        //print("Prenotato: ${prodottoPrenotato.quantita}");
 
         DocumentReference? prodottoRef = prodottoPrenotato.prodotto;
         // Carica il prodotto associato
         Future<void> task = prodottoRef.get().then((prodottoDoc) {
           if (prodottoDoc.exists) {
             Prodotto prodotto = Prodotto.fromFirestore(prodottoDoc);
-            print("Prodotto associato: ${prodotto.nome}");
+            //print("Prodotto associato: ${prodotto.nome}");
 
             listaProdottiAssociati.add({
               "prodottoPrenotato": prodottoPrenotato,
@@ -609,12 +575,12 @@ class UserViewModel extends ChangeNotifier {
         });
 
         tasks.add(task);
-            }
+      }
 
-      // Attendi il completamento di tutti i task
+      //Faccio eseguire tutti i tasks
       await Future.wait(tasks);
 
-      // Ordina i prodotti per nome
+      //Ordinamento
       listaProdottiAssociati.sort(
               (a, b) => a["prodotto"].nome.compareTo(b["prodotto"].nome));
 
@@ -635,7 +601,7 @@ class UserViewModel extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      // Trova il documento da eliminare
+      //Trovo il documento da eliminare
       QuerySnapshot querySnapshot = await _db
           .collection("prodottiPrenotati")
           .where("prodotto", isEqualTo: prodottoPren.prodotto)
@@ -651,7 +617,7 @@ class UserViewModel extends ChangeNotifier {
         }
       }
 
-      // Aggiorna la quantità del prodotto SENZA transazione
+      //Aggiorno la quantità del prodotto
       DocumentReference prodottoReference = prodottoPren.prodotto;
 
       DocumentSnapshot snapshot = await prodottoReference.get();
@@ -662,7 +628,7 @@ class UserViewModel extends ChangeNotifier {
         await prodottoReference.update({"quantita": nuovaQuantita});
       }
 
-      // Dopo l'aggiornamento ricarica la lista dei prodotti prenotati
+      //Ricarico lista
       await caricaProdottiPrenotati();
 
 

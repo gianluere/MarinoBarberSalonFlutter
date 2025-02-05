@@ -40,33 +40,33 @@ class ProdottiPrenotati extends StatelessWidget {
                 Expanded(
                   child: userViewModel.listaProdottiPrenotati.isNotEmpty
                       ? ListView.builder(
-                    itemCount: userViewModel.listaProdottiPrenotati.length,
-                    itemBuilder: (context, index) {
-                      return ProdPrenItem(
-                        item: userViewModel.listaProdottiPrenotati[index],
-                        onDelete: () {
-                          userViewModel.annullaPrenotazioneProdotto(userViewModel.listaProdottiPrenotati[index]['prodottoPrenotato']);
-                        },
-                      );
-                    },
-                  )
+                      itemCount: userViewModel.listaProdottiPrenotati.length,
+                      itemBuilder: (context, index) {
+                        return ProdPrenItem(
+                          item: userViewModel.listaProdottiPrenotati[index],
+                          onDelete: () {
+                            userViewModel.annullaPrenotazioneProdotto(userViewModel.listaProdottiPrenotati[index]['prodottoPrenotato']);
+                          },
+                        );
+                      },
+                      )
                       : Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                      child: Container(
-                        padding: EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: myGold, width: 3),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          "NON CI SONO PRODOTTI PRENOTATI",
-                          style: TextStyle(fontSize: 20, color: myWhite),
-                          textAlign: TextAlign.center,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: Container(
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: myGold, width: 3),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              "NON CI SONO PRODOTTI PRENOTATI",
+                              style: TextStyle(fontSize: 20, color: myWhite),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
                 ),
               ],
             );
@@ -143,14 +143,8 @@ class ProdPrenItem extends StatelessWidget {
                       prodotto.nome,
                       style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Quantità: ${prodottoPrenotato.quantita}"),
-                        Text("Prezzo: ${(prodotto.prezzo * prodottoPrenotato.quantita.toDouble()).toStringAsFixed(2)}€"),
-                      ],
-                    ),
+                    Text("Quantità: ${prodottoPrenotato.quantita}"),
+                    Text("Prezzo: ${(prodotto.prezzo * prodottoPrenotato.quantita.toDouble()).toStringAsFixed(2)}€")
                   ],
                 ),
               ),

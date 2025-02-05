@@ -10,8 +10,6 @@ class ProdottoShop extends StatefulWidget {
   const ProdottoShop({super.key});
 
 
-  
-
   @override
   _ProdottoShopState createState() => _ProdottoShopState();
 }
@@ -90,17 +88,17 @@ class _ProdottoShopState extends State<ProdottoShop> {
                 const SizedBox(height: 10),
                 prodotto.quantita > 0
                     ? Row(
-                  children: [
-                    Text("Quantità: $counter", style: TextStyle(fontSize: 24, color: myWhite)),
-                    const SizedBox(width: 15),
-                    _buildCounterButton(Icons.remove, () {
-                      if (counter > 1) setState(() => counter--);
-                    }),
-                    _buildCounterButton(Icons.add, () {
-                      if (counter < prodotto.quantita) setState(() => counter++);
-                    }),
-                  ],
-                )
+                        children: [
+                          Text("Quantità: $counter", style: TextStyle(fontSize: 24, color: myWhite)),
+                          const SizedBox(width: 15),
+                          _buildCounterButton(Icons.remove, () {
+                            if (counter > 1) setState(() => counter--);
+                          }),
+                          _buildCounterButton(Icons.add, () {
+                            if (counter < prodotto.quantita) setState(() => counter++);
+                          }),
+                        ],
+                    )
                     : Text("Attualmente non disponibile", style: TextStyle(fontSize: 24, color: myWhite)),
                 const Spacer(),
 
@@ -109,13 +107,13 @@ class _ProdottoShopState extends State<ProdottoShop> {
                   child: ElevatedButton(
                     onPressed: prodotto.quantita > 0
                         ? () {
-                      listaProdottiViewModel.prenotaProdotto(
-                        prodotto,
-                        counter,
-                        () => setState(() => showDialogSuccess = true),
-                        () => setState(() => showDialogError = true),
-                      );
-                    }
+                          listaProdottiViewModel.prenotaProdotto(
+                            prodotto,
+                            counter,
+                            () => setState(() => showDialogSuccess = true),
+                            () => setState(() => showDialogError = true),
+                          );
+                        }
                         : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: myBordeaux,
@@ -155,7 +153,7 @@ class _ProdottoShopState extends State<ProdottoShop> {
             borderRadius: icon == Icons.remove ? BorderRadius.horizontal(left: Radius.circular(20)) : BorderRadius.horizontal(right: Radius.circular(20)),
             side: BorderSide(color: myGold, width: 3)
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: myWhite,
       ),
       child: Icon(icon, color: Colors.black),
     );

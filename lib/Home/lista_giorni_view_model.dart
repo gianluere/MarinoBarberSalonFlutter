@@ -27,17 +27,19 @@ class ListaGiorniViewModel extends ChangeNotifier{
       _listaGiorniAggiornata;
 
 
-  // Metodo per inizializzare i dati
+
   Future<void> initialize(DateTime oggi, int giorniTotali, int durataServizio) async {
     try {
       _isLoading = true;
       notifyListeners();
-      // Genera la lista dei giorni
+
+      //Genera la lista dei giorni
       _listaGiorni = _generateListaDate(oggi, giorniTotali, giorniFestivi);
       _listaGiorniAggiornata = List.from(_listaGiorni);
 
-      // Genera la lista degli orari occupati da Firestore
+      //Genera la lista degli orari occupati da Firestore
       _listaGiorniOccupati = await _generaListaOccupati(oggi, giorniTotali);
+      /*
       print(_listaGiorniOccupati.length);
       for (var mappa in _listaGiorniOccupati) {
         for (var entry in mappa.entries) {
@@ -55,11 +57,13 @@ class ListaGiorniViewModel extends ChangeNotifier{
         }
       }
 
-      // Aggiorna la lista dei giorni con quelli occupati
+       */
+
+      //Aggiorna la lista dei giorni con quelli occupati
       _listaGiorniAggiornata =
           _aggiornaListaOccupati(_listaGiorni, _listaGiorniOccupati);
 
-      // Se il servizio dura più di 30 minuti, aggiorna gli slot
+      //Se il servizio dura più di 30 minuti, aggiorna gli slot
       if (durataServizio > 30) {
         _listaGiorniAggiornata =
             _aggiornaSlotdaSessanta(_listaGiorniAggiornata);
@@ -72,7 +76,8 @@ class ListaGiorniViewModel extends ChangeNotifier{
     }
   }
 
-  // Generazione della lista di date
+  ///Generazione della lista di date
+  ///ogni slot è da 30 minuti
   List<Map<DateTime, List<Map<String, String>>>> _generateListaDate(
       DateTime oggi, int giorniTotali, List<DateTime> giorniFestivi) {
     final List<Map<DateTime, List<Map<String, String>>>> giorniDisponibili = [];
@@ -85,7 +90,7 @@ class ListaGiorniViewModel extends ChangeNotifier{
       final giornoCorrente = normalizedDate(oggi.add(Duration(days: i)));
 
 
-      // Escludi domenica, lunedì e giorni festivi
+      // Escludo domenica, lunedì e giorni festivi
       if (giornoCorrente.weekday == DateTime.sunday ||
           giornoCorrente.weekday == DateTime.monday ||
           giorniFestivi.contains(giornoCorrente)) {
@@ -113,7 +118,7 @@ class ListaGiorniViewModel extends ChangeNotifier{
     return giorniDisponibili;
   }
 
-  // Recupera la lista degli orari occupati da Firestore
+  //Recupera la lista degli orari occupati da Firestore
   Future<List<Map<DateTime, List<Map<String, String>>>>> _generaListaOccupati(
       DateTime oggi, int giorniTotali) async {
     final List<Map<DateTime, List<Map<String, String>>>> listaOccupati = [];
@@ -132,19 +137,21 @@ class ListaGiorniViewModel extends ChangeNotifier{
 
           final slotOrari = <Map<String, String>>[];
           final dati = giorno.data();
+          //non vengono recuperati in ordine cronologico, quindi li ordino qui
           final orariOrdinati = dati.keys.toList()..sort((a, b) {
             final orarioInizioA = DateFormat('HH:mm').parse(a.split('-')[0].trim());
             final orarioInizioB = DateFormat('HH:mm').parse(b.split('-')[0].trim());
             return orarioInizioA.compareTo(orarioInizioB);
           });
 
+          //verifico la presenza di slot da 60 che trasformo in due slot da 30
           for (var key in orariOrdinati) {
             final orarioInizio = DateFormat('HH:mm').parse(key.split('-')[0].trim());
             final orarioFine = DateFormat('HH:mm').parse(key.split('-')[1].trim());
 
             final durataSlot = orarioFine.difference(orarioInizio).inMinutes;
 
-            if (durataSlot >= 60) { // Se la durata è di almeno un'ora, dividiamo in due slot da 30 minuti
+            if (durataSlot >= 60) { //divido in due slot da 30 minuti
               final primoSlotFine = orarioInizio.add(Duration(minutes: 30));
               slotOrari.add({
                 "inizio": DateFormat('HH:mm').format(orarioInizio),
@@ -155,7 +162,7 @@ class ListaGiorniViewModel extends ChangeNotifier{
                 "fine": DateFormat('HH:mm').format(orarioFine),
               });
             } else {
-              // Aggiungi lo slot originale
+              // Aggiungo lo slot originale
               slotOrari.add({
                 "inizio": DateFormat('HH:mm').format(orarioInizio),
                 "fine": DateFormat('HH:mm').format(orarioFine),
@@ -178,20 +185,25 @@ class ListaGiorniViewModel extends ChangeNotifier{
       List<Map<DateTime, List<Map<String, String>>>> listaOrari,
       List<Map<DateTime, List<Map<String, String>>>> listaOccupati) {
     return listaOrari.map((giorno) {
+      //Prendo la data corrente dalla mappa (c'è solo una chiave per ogni mappa)
       final data = giorno.keys.first;
+
+      //Prendo gli orari disponibili per quella data
       final orariDisponibili = giorno[data] ?? [];
+
+      //uso normalizedDate per confrontare le date senza tener conto dell'orario
       final occupatiPerQuestaData = listaOccupati.firstWhere(
             (item) => normalizedDate(item.keys.first) == normalizedDate(data),
         orElse: () => {data: []},
       )[data];
 
-
+      // Filtra gli orari disponibili escludendo quelli che coincidono con gli orari occupati
       final orariAggiornati = orariDisponibili
           .where((orario) =>
       !(occupatiPerQuestaData?.any((occupato) =>
       occupato["inizio"] == orario["inizio"] &&
           occupato["fine"] == orario["fine"]) ??
-          false))
+          false)) // Se occupatiPerQuestaData è null, il valore di default è false
           .toList();
 
       return {data: orariAggiornati};
@@ -211,7 +223,7 @@ class ListaGiorniViewModel extends ChangeNotifier{
         final orarioCorrente = orari[i];
         final orarioSuccessivo = orari[i + 1];
 
-        // Controlla se l'inizio del secondo orario corrisponde alla fine del primo
+        //Controlla se l'inizio del secondo orario corrisponde alla fine del primo
         if (orarioCorrente['fine'] == orarioSuccessivo['inizio']) {
           final nuovoOrario = {
             "inizio": orarioCorrente['inizio']!,
@@ -221,7 +233,6 @@ class ListaGiorniViewModel extends ChangeNotifier{
         }
       }
 
-      // Restituisci la nuova lista per quel giorno
       return {data: nuoviOrari};
     }).toList();
   }

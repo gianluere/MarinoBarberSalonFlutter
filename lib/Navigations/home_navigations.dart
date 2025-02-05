@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:marino_barber_salon_flutter/Home/home2.dart';
 import 'package:marino_barber_salon_flutter/Home/riepilogo.dart';
 import 'package:marino_barber_salon_flutter/Home/seleziona_giorno.dart';
 import 'package:marino_barber_salon_flutter/Home/seleziona_servizio.dart';

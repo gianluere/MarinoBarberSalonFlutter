@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:marino_barber_salon_flutter/app_bar.dart';
-import 'package:marino_barber_salon_flutter/bottom_bar.dart';
 import 'package:marino_barber_salon_flutter/my_colors.dart';
 import 'package:provider/provider.dart';
 import 'user_view_model.dart';

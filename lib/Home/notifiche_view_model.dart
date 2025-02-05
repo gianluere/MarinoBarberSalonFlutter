@@ -22,6 +22,7 @@ class NotificheViewModel extends ChangeNotifier {
 
     _startListenerPrenotazioni();
 
+    //in casi di logout e nuovi accessi
     _auth.authStateChanges().listen((User? user) {
       if (user != null) {
        _startListenerPrenotazioni();
@@ -36,6 +37,7 @@ class NotificheViewModel extends ChangeNotifier {
 
   }
 
+  //notifiche per la bottomBar e pagina account
   void _startListenerPrenotazioni() {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -47,10 +49,10 @@ class NotificheViewModel extends ChangeNotifier {
             ?.cast<DocumentReference>();
 
         if (appuntamentiList != null) {
-          debugPrint("Appuntamenti trovati: ${appuntamentiList.length}");
+          //debugPrint("Appuntamenti trovati: ${appuntamentiList.length}");
 
           final appuntamenti = await _recuperaDocumenti(appuntamentiList);
-          debugPrint("Appuntamenti validi: ${appuntamenti.length}");
+          //debugPrint("Appuntamenti validi: ${appuntamenti.length}");
 
           _calcolaNotifiche(appuntamenti);
         }
@@ -92,6 +94,7 @@ class NotificheViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  //elimina il listener
   void stopListenerPrenotazioni() {
     _prenotazioniSubscription?.cancel();
     _prenotazioniSubscription = null;

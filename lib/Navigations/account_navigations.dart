@@ -45,7 +45,7 @@ class AccountNavigatorState extends State<AccountNavigator> {
   }
 }
 
-
+//Serve per risolvere un problema in aggiungi recensione
 class AccountRouteObserver extends NavigatorObserver {
   //String? currentRoute;
   final ValueNotifier<String?> currentRoute = ValueNotifier<String?>(null);

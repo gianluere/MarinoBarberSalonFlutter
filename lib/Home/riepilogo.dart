@@ -7,26 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../user_view_model.dart';
 
-/*
-class Riepilogo extends StatelessWidget{
-
-
-  @override
-  Widget build(BuildContext context) {
-
-    final riepilogo = ModalRoute.of(context)?.settings.arguments as DatiRiepilogo;
-    return Scaffold(
-      appBar: MyAppBar('RIEPILOGO', true),
-      body: Center(
-        child: Text('${riepilogo.orarioInizio} - ${riepilogo.orarioFine} - ${riepilogo.data}'),
-      ),
-    );
-  }
-
-}
-
- */
-
+//Per passare i dati nella navigazione
 class DatiRiepilogo{
 
   final String orarioInizio;
@@ -72,102 +53,102 @@ class _RiepilogoState extends State<Riepilogo> {
       ? Center(child: CircularProgressIndicator(color: myGold,))
       : !showDialogError && !showDialogSuccess
           ? Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Servizio: ${riepilogo.servizio.nome}",
-              style: const TextStyle(
-                fontSize: 20,
-                color: myGold,
-              ),
-            ),
-            const Divider(thickness: 2, color: myWhite),
-            Text(
-              "Durata: ${riepilogo.servizio.durata} minuti",
-              style: const TextStyle(
-                fontSize: 20,
-                color: myGold,
-              ),
-            ),
-            const Divider(thickness: 2, color: myWhite),
-            Text(
-              "Data: $dataFormatted",
-              style: const TextStyle(
-                fontSize: 20,
-                color: myGold,
-              ),
-            ),
-            const Divider(thickness: 2, color: myWhite),
-            Text(
-              "Ora: ${riepilogo.orarioInizio} - ${riepilogo.orarioFine}",
-              style: const TextStyle(
-                fontSize: 20,
-                color: myGold,
-              ),
-            ),
-            const Divider(thickness: 2, color: myWhite),
-            const Spacer(),
-            Padding(
-              padding: EdgeInsets.only(bottom: 10.0),
-              child:
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Text(
-                  "Totale: ${NumberFormat('##0.00', 'it_IT').format(riepilogo.servizio.prezzo)}€",
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Servizio: ${riepilogo.servizio.nome}",
                   style: const TextStyle(
                     fontSize: 20,
                     color: myGold,
-                    decoration: TextDecoration.underline,
-                    decorationColor: myWhite
                   ),
                 ),
-              ),
+                const Divider(thickness: 2, color: myWhite),
+                Text(
+                  "Durata: ${riepilogo.servizio.durata} minuti",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: myGold,
+                  ),
+                ),
+                const Divider(thickness: 2, color: myWhite),
+                Text(
+                  "Data: $dataFormatted",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: myGold,
+                  ),
+                ),
+                const Divider(thickness: 2, color: myWhite),
+                Text(
+                  "Ora: ${riepilogo.orarioInizio} - ${riepilogo.orarioFine}",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: myGold,
+                  ),
+                ),
+                const Divider(thickness: 2, color: myWhite),
+                const Spacer(),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 10.0),
+                  child:
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Text(
+                      "Totale: ${NumberFormat('##0.00', 'it_IT').format(riepilogo.servizio.prezzo)}€",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: myGold,
+                        decoration: TextDecoration.underline,
+                        decorationColor: myWhite
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child:
+                    ElevatedButton(
+                      onPressed: () {
+
+                        userViewModel.aggiungiAppuntamento(
+                            servizio: riepilogo.servizio.nome!,
+                            orarioInizio: riepilogo.orarioInizio,
+                            orarioFine: riepilogo.orarioFine,
+                            dataSel: dataFormatted,
+                            onSuccess: (){
+                              setState(() {
+                                showDialogSuccess = true;
+                              });
+                            },
+                            onFailed: () {
+                              setState(() {
+                                showDialogError = true;
+                              });
+                            });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: myBordeaux,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                          padding: EdgeInsets.symmetric(vertical: 14.0)
+                      ),
+                      child: const Text(
+                        'PRENOTA',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: myGold,
+                        ),
+                      ),
+                    ),
+
+                )
+
+              ],
             ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child:
-                ElevatedButton(
-                  onPressed: () {
-
-                    userViewModel.aggiungiAppuntamento(
-                        servizio: riepilogo.servizio.nome!,
-                        orarioInizio: riepilogo.orarioInizio,
-                        orarioFine: riepilogo.orarioFine,
-                        dataSel: dataFormatted,
-                        onSuccess: (){
-                          setState(() {
-                            showDialogSuccess = true;
-                          });
-                        },
-                        onFailed: () {
-                          setState(() {
-                            showDialogError = true;
-                          });
-                        });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: myBordeaux,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                      padding: EdgeInsets.symmetric(vertical: 14.0)
-                  ),
-                  child: const Text(
-                    'PRENOTA',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: myGold,
-                    ),
-                  ),
-                ),
-
-            )
-
-          ],
-        ),
       )
           : showDialogSuccess
           ? DialogSuccess(

@@ -140,7 +140,7 @@ class GridItem extends StatelessWidget {
                   child: Text(
                     prodotto.nome,
                     style: const TextStyle(color: myWhite, fontSize: 14),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

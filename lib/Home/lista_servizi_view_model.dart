@@ -51,10 +51,11 @@ class ListaServiziViewModel extends ChangeNotifier{
     try {
       final snapshot = await _db.collection("servizi").get();
 
-      // Converte i documenti Firebase in una lista di oggetti `Servizio`
+      //Converte i documenti Firebase in una lista di oggetti `Servizio`
       _listaServizi = snapshot.docs.map((doc) {
         final servizio = Servizio.fromMap(doc.data());
-        // Rimuove spazi multipli nella descrizione
+
+        //Rimuove spazi multipli nella descrizione
         if (servizio.descrizione != null) {
           servizio.descrizione = servizio.descrizione!.replaceAll(RegExp(r'\s+'), ' ');
         }
